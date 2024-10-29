@@ -18,6 +18,7 @@ class RefTypeResource extends Resource
     protected static ?string $model = RefType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form
     {
@@ -91,8 +92,8 @@ class RefTypeResource extends Resource
     {
         return [
             'index' => Pages\ListRefTypes::route('/'),
-            'create' => Pages\CreateRefType::route('/create'),
-            'edit' => Pages\EditRefType::route('/{record}/edit'),
+            // 'create' => Pages\CreateRefType::route('/create'),
+            // 'edit' => Pages\EditRefType::route('/{record}/edit'),
         ];
     }
 }

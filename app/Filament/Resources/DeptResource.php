@@ -18,6 +18,7 @@ class DeptResource extends Resource
     protected static ?string $model = Dept::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form
     {
@@ -87,8 +88,8 @@ class DeptResource extends Resource
     {
         return [
             'index' => Pages\ListDepts::route('/'),
-            'create' => Pages\CreateDept::route('/create'),
-            'edit' => Pages\EditDept::route('/{record}/edit'),
+            // 'create' => Pages\CreateDept::route('/create'),
+            // 'edit' => Pages\EditDept::route('/{record}/edit'),
         ];
     }
 }

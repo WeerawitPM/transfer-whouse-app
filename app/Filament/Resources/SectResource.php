@@ -18,6 +18,7 @@ class SectResource extends Resource
     protected static ?string $model = Sect::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form
     {
@@ -87,8 +88,8 @@ class SectResource extends Resource
     {
         return [
             'index' => Pages\ListSects::route('/'),
-            'create' => Pages\CreateSect::route('/create'),
-            'edit' => Pages\EditSect::route('/{record}/edit'),
+            // 'create' => Pages\CreateSect::route('/create'),
+            // 'edit' => Pages\EditSect::route('/{record}/edit'),
         ];
     }
 }

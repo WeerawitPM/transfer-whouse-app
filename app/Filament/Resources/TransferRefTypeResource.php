@@ -2,36 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EmplrResource\Pages;
-use App\Filament\Resources\EmplrResource\RelationManagers;
-use App\Models\Emplr;
+use App\Filament\Resources\TransferRefTypeResource\Pages;
+use App\Models\TransferRefType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 
-class EmplrResource extends Resource
+class TransferRefTypeResource extends Resource
 {
-    protected static ?string $model = Emplr::class;
+    protected static ?string $model = TransferRefType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('FCSKID')
-                    ->required(),
-                Forms\Components\TextInput::make('FCLOGIN')
-                    ->required(),
-                Forms\Components\TextInput::make('FCPW')
-                    ->required(),
-                Forms\Components\TextInput::make('FCRCODE')
-                    ->required(),
+                Section::make()
+                    ->columns(1)
+                    ->schema([
+                        Select::make('ref_type_id')
+                            ->label('Ref Type ID')
+                            ->relationship('ref_type', 'FCNAME')
+                            ->required(),
+                        Forms\Components\Toggle::make('is_active')
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -47,14 +47,11 @@ class EmplrResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('FCSKID')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCLOGIN')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCPW')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCRCODE')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('ref_type.FCNAME')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean(),
             ])
             ->filters([
                 //
@@ -79,9 +76,9 @@ class EmplrResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEmplrs::route('/'),
-            // 'create' => Pages\CreateEmplr::route('/create'),
-            // 'edit' => Pages\EditEmplr::route('/{record}/edit'),
+            'index' => Pages\ListTransferRefTypes::route('/'),
+            // 'create' => Pages\CreateTransferRefType::route('/create'),
+            // 'edit' => Pages\EditTransferRefType::route('/{record}/edit'),
         ];
     }
 }

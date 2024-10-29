@@ -2,37 +2,34 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\WhouseResource\Pages;
-use App\Filament\Resources\WhouseResource\RelationManagers;
-use App\Models\Whouse;
+use App\Filament\Resources\TransferBookResource\Pages;
+use App\Models\TransferBook;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
 
-class WhouseResource extends Resource
+class TransferBookResource extends Resource
 {
-    protected static ?string $model = Whouse::class;
+    protected static ?string $model = TransferBook::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('FCSKID')
+                Select::make('transfer_ref_type_id')
+                    ->label('Transfer Ref Type ID')
+                    ->relationship('transfer_ref_type', 'FCNAME')
                     ->required(),
-                Forms\Components\TextInput::make('FCCORP')
+                Select::make('book_id')
+                    ->label('Book')
+                    ->relationship('book', 'FCNAME')
                     ->required(),
-                Forms\Components\TextInput::make('FCBRANCH')
-                    ->required(),
-                Forms\Components\TextInput::make('FCCODE')
-                    ->required(),
-                Forms\Components\TextInput::make('FCNAME')
+                Forms\Components\Toggle::make('is_active')
                     ->required(),
             ]);
     }
@@ -49,16 +46,14 @@ class WhouseResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('FCSKID')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCCORP')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCBRANCH')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCCODE')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCNAME')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('transfer_ref_type_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('book_id')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean(),
             ])
             ->filters([
                 //
@@ -83,9 +78,9 @@ class WhouseResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListWhouses::route('/'),
-            // 'create' => Pages\CreateWhouse::route('/create'),
-            // 'edit' => Pages\EditWhouse::route('/{record}/edit'),
+            'index' => Pages\ListTransferBooks::route('/'),
+            'create' => Pages\CreateTransferBook::route('/create'),
+            'edit' => Pages\EditTransferBook::route('/{record}/edit'),
         ];
     }
 }

@@ -18,6 +18,7 @@ class BookResource extends Resource
     protected static ?string $model = Book::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form
     {
@@ -105,8 +106,8 @@ class BookResource extends Resource
     {
         return [
             'index' => Pages\ListBooks::route('/'),
-            'create' => Pages\CreateBook::route('/create'),
-            'edit' => Pages\EditBook::route('/{record}/edit'),
+            // 'create' => Pages\CreateBook::route('/create'),
+            // 'edit' => Pages\EditBook::route('/{record}/edit'),
         ];
     }
 }

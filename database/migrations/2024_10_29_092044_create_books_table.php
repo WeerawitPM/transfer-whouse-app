@@ -25,12 +25,10 @@ return new class extends Migration {
                 ->nullable()
                 ->constrained('whouses')
                 ->nullOnDelete();
-            ;
             $table->foreignId('TO_WHS')
                 ->nullable()
                 ->constrained('whouses')
                 ->nullOnDelete();
-            ;
         });
     }
 

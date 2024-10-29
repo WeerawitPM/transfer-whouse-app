@@ -18,6 +18,7 @@ class CorpResource extends Resource
     protected static ?string $model = Corp::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form
     {
@@ -95,8 +96,8 @@ class CorpResource extends Resource
     {
         return [
             'index' => Pages\ListCorps::route('/'),
-            'create' => Pages\CreateCorp::route('/create'),
-            'edit' => Pages\EditCorp::route('/{record}/edit'),
+            // 'create' => Pages\CreateCorp::route('/create'),
+            // 'edit' => Pages\EditCorp::route('/{record}/edit'),
         ];
     }
 }
