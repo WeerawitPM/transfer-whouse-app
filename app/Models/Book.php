@@ -21,11 +21,11 @@ class Book extends Model
 
     public function from_whs()
     {
-        return $this->belongsTo(Whouse::class);
+        return $this->belongsTo(Whouse::class, 'from_whs_id');
     }
 
     public function to_whs()
     {
-        return $this->belongsTo(Whouse::class);
+        return $this->belongsTo(Whouse::class, 'to_whs_id');
     }
 }

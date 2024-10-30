@@ -23,22 +23,14 @@ class BookResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('FCSKID')
-                    ->required(),
-                Forms\Components\TextInput::make('FCREFTYPE')
-                    ->required(),
-                Forms\Components\TextInput::make('FCCORP')
-                    ->required(),
-                Forms\Components\TextInput::make('FCBRANCH')
-                    ->required(),
-                Forms\Components\TextInput::make('FCCODE')
-                    ->required(),
-                Forms\Components\TextInput::make('FCNAME')
-                    ->required(),
-                Forms\Components\TextInput::make('FCNAME2')
-                    ->required(),
-                Forms\Components\TextInput::make('FCACCBOOK')
-                    ->required(),
+                Forms\Components\TextInput::make('FCSKID'),
+                Forms\Components\TextInput::make('FCREFTYPE'),
+                Forms\Components\TextInput::make('FCCORP'),
+                Forms\Components\TextInput::make('FCBRANCH'),
+                Forms\Components\TextInput::make('FCCODE'),
+                Forms\Components\TextInput::make('FCNAME'),
+                Forms\Components\TextInput::make('FCNAME2'),
+                Forms\Components\TextInput::make('FCACCBOOK'),
                 Select::make('from_whs_id')
                     ->searchable()
                     ->options(Whouse::all()->mapWithKeys(function (Whouse $whouse) {

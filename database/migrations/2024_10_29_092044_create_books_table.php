@@ -14,13 +14,20 @@ return new class extends Migration {
             $table->id();
             $table->timestamps();
             $table->string('FCSKID');
-            $table->string('FCREFTYPE');
-            $table->string('FCCORP');
-            $table->string('FCBRANCH');
-            $table->string('FCCODE');
-            $table->string('FCNAME');
-            $table->string('FCNAME2');
-            $table->string('FCACCBOOK');
+            $table->string('FCREFTYPE')
+                ->nullable();
+            $table->string('FCCORP')
+                ->nullable();
+            $table->string('FCBRANCH')
+                ->nullable();
+            $table->string('FCCODE')
+                ->nullable();
+            $table->string('FCNAME')
+                ->nullable();
+            $table->string('FCNAME2')
+                ->nullable();
+            $table->string('FCACCBOOK')
+                ->nullable();
             $table->foreignId('from_whs_id')
                 ->nullable()
                 ->constrained('whouses')
