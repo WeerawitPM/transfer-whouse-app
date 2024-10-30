@@ -4,10 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransferBookMenuResource\Pages;
 use App\Models\TransferBook;
+use App\Models\TransferRefType;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\SelectFilter; // เพิ่มการนำเข้าฟิลเตอร์
 
 class TransferBookMenuResource extends Resource
 {
@@ -32,14 +34,6 @@ class TransferBookMenuResource extends Resource
         return $table
             ->query(TransferBook::query()->where('is_active', true)) // ใช้เมธอด query ตรงๆ
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('transfer_ref_type')
                     ->formatStateUsing(fn(TransferBook $record) => "{$record->transfer_ref_type->ref_type->FCCODE} {$record->transfer_ref_type->ref_type->FCNAME}")
                     ->sortable(),
@@ -58,7 +52,18 @@ class TransferBookMenuResource extends Resource
                     ->boolean(),
             ])
             ->filters([
-                //
+                SelectFilter::make('transfer_ref_type')
+                    // ->relationship('transfer_ref_type', 'id')
+                    ->options(
+                        TransferRefType::with('ref_type')
+                            ->get()
+                            ->mapWithKeys(function ($transfer_ref_type) {
+                                $refType = $transfer_ref_type->ref_type;
+                                return [$transfer_ref_type->id => "{$refType->FCCODE} {$refType->FCNAME}"];
+                            })
+                    )
+                    ->searchable()
+                    ->attribute('transfer_ref_type_id')
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
