@@ -144,17 +144,17 @@ return [
 
         'kanban' => [
             'driver' => 'sqlsrv',
-            'url' => env('FORMULA_URL'),
-            'host' => env('FORMULA_HOST', 'localhost'),
-            'port' => env('FORMULA_PORT', '1433'),
-            'database' => env('FORMULA_DBNAME', 'laravel'),
-            'username' => env('FORMULA_USERNAME', 'root'),
-            'password' => env('FORMULA_PASSWORD', ''),
-            'charset' => env('FORMULA_CHARSET', 'utf8'),
+            'url' => env('KANBAN_URL'),
+            'host' => env('KANBAN_HOST', 'localhost'),
+            'port' => env('KANBAN_PORT', '1433'),
+            'database' => env('KANBAN_DBNAME', 'laravel'),
+            'username' => env('KANBAN_USERNAME', 'root'),
+            'password' => env('KANBAN_PASSWORD', ''),
+            'charset' => env('KANBAN_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'encrypt' => env('FORMULA_ENCRYPT', 'yes'),
-            'trust_server_certificate' => env('FORMULA_TRUST_SERVER_CERTIFICATE', 'yes'),
+            'encrypt' => env('KANBAN_ENCRYPT', 'yes'),
+            'trust_server_certificate' => env('KANBAN_TRUST_SERVER_CERTIFICATE', 'yes'),
         ],
 
 

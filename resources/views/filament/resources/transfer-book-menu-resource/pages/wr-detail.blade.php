@@ -13,5 +13,7 @@
             </div>
         </form>
     </x-filament::card>
-    {{ $this->table }}
+    <div>
+        {{ $this->table }}
+    </div>
 </x-filament-panels::page>

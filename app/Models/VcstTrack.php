@@ -13,7 +13,7 @@ class VcstTrack extends Model
     protected $table = 'TRACK';
 
     // ระบุฟิลด์ที่เป็น primary key
-    protected $primaryKey = 'FCSKID';
+    protected $primaryKey = 'KANBAN';
     protected $keyType = 'string';
 
     // ถ้าตารางนี้ไม่มีฟิลด์ timestamps
