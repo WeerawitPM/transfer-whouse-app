@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransferRefTypeResource\Pages;
 use App\Models\TransferRefType;
+use App\Models\RefType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,6 +18,7 @@ class TransferRefTypeResource extends Resource
     protected static ?string $model = TransferRefType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Setup Book';
 
     public static function form(Form $form): Form
     {
@@ -27,7 +29,12 @@ class TransferRefTypeResource extends Resource
                     ->schema([
                         Select::make('ref_type_id')
                             ->label('Ref Type ID')
-                            ->relationship('ref_type', 'FCNAME')
+                            // ->relationship('ref_type')
+                            // ->getOptionLabelFromRecordUsing(fn(RefType $record) => "{$record->FCCODE} {$record->FCNAME}")
+                            ->options(RefType::all()->mapWithKeys(function (RefType $book) {
+                                return [$book->id => "{$book->FCCODE} {$book->FCNAME}"];
+                            }))
+                            ->searchable()
                             ->required(),
                         Forms\Components\Toggle::make('is_active')
                             ->required(),
@@ -47,8 +54,8 @@ class TransferRefTypeResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('ref_type.FCNAME')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('ref_type')
+                    ->formatStateUsing(fn(TransferRefType $record) => "{$record->ref_type->FCCODE} {$record->ref_type->FCNAME}")
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),

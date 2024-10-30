@@ -21,11 +21,11 @@ return new class extends Migration {
             $table->string('FCNAME');
             $table->string('FCNAME2');
             $table->string('FCACCBOOK');
-            $table->foreignId('FROM_WHS')
+            $table->foreignId('from_whs_id')
                 ->nullable()
                 ->constrained('whouses')
                 ->nullOnDelete();
-            $table->foreignId('TO_WHS')
+            $table->foreignId('to_whs_id')
                 ->nullable()
                 ->constrained('whouses')
                 ->nullOnDelete();

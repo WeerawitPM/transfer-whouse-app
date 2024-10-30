@@ -3,15 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BookResource\Pages;
-use App\Filament\Resources\BookResource\RelationManagers;
 use App\Models\Book;
+use App\Models\Whouse;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
 
 class BookResource extends Resource
 {
@@ -40,10 +39,16 @@ class BookResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('FCACCBOOK')
                     ->required(),
-                Forms\Components\TextInput::make('FROM_WHS')
-                    ->numeric(),
-                Forms\Components\TextInput::make('TO_WHS')
-                    ->numeric(),
+                Select::make('from_whs_id')
+                    ->searchable()
+                    ->options(Whouse::all()->mapWithKeys(function (Whouse $whouse) {
+                        return [$whouse->id => "{$whouse->FCCODE} {$whouse->FCNAME}"];
+                    })),
+                Select::make('to_whs_id')
+                    ->searchable()
+                    ->options(Whouse::all()->mapWithKeys(function (Whouse $whouse) {
+                        return [$whouse->id => "{$whouse->FCCODE} {$whouse->FCNAME}"];
+                    })),
             ]);
     }
 
@@ -75,11 +80,9 @@ class BookResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCACCBOOK')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('FROM_WHS')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('from_whs.FCCODE')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('TO_WHS')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('to_whs.FCCODE')
                     ->sortable(),
             ])
             ->filters([

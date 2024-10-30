@@ -15,7 +15,17 @@ class Book extends Model
         'FCNAME',
         'FCNAME2',
         'FCACCBOOK',
-        'FROM_WHS',
-        'TO_WHS',
+        'from_whs_id',
+        'to_whs_id',
     ];
+
+    public function from_whs()
+    {
+        return $this->belongsTo(Whouse::class);
+    }
+
+    public function to_whs()
+    {
+        return $this->belongsTo(Whouse::class);
+    }
 }

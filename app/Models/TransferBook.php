@@ -14,7 +14,7 @@ class TransferBook extends Model
 
     public function transfer_ref_type()
     {
-        return $this->hasMany(TransferRefType::class);
+        return $this->belongsTo(TransferRefType::class);
     }
 
     public function book()
