@@ -66,7 +66,12 @@ class TransferBookMenuResource extends Resource
                     ->attribute('transfer_ref_type_id')
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                // Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('wr_detail')
+                    ->label('Detail')
+                    // ->icon('heroicon-o-eye')
+                    ->url(fn(TransferBook $record): string =>  self::getUrl('wr_detail', ['record' => $record])),
+                    // ->openUrlInNewTab()
             ]);
     }
 
@@ -81,6 +86,7 @@ class TransferBookMenuResource extends Resource
     {
         return [
             'index' => Pages\ListTransferBookMenus::route('/'),
+            'wr_detail' => Pages\WrDetail::route('/{record}/wr_detail'),
             // 'create' => Pages\CreateTransferBookMenu::route('/create'),
             // 'edit' => Pages\EditTransferBookMenu::route('/{record}/edit'),
         ];
