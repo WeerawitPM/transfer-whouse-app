@@ -4,7 +4,6 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
 // use Filament\Actions\Action;
-use App\Models\Book;
 use App\Models\VcstTrack;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\DatePicker;
@@ -15,6 +14,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Route; // Import Route facade
 
 class WrDetail extends Page implements HasTable
 {
@@ -25,6 +26,14 @@ class WrDetail extends Page implements HasTable
 
     public $startDate;
     public $endDate;
+    public $id; // Property to hold the ID
+
+    // Override the mount method to access the request
+    public function mount()
+    {
+        $this->id = Route::current()->parameter('record'); // Get the ID from the route parameters
+    }
+
 
     protected function getFormSchema(): array
     {
@@ -49,13 +58,15 @@ class WrDetail extends Page implements HasTable
             return VcstTrack::getTrack($this->startDate, $this->endDate);
         }
 
-        return VcstTrack::query()
-            //return null
-            ->where('JOB_NO', 'Hello World');
+        return VcstTrack::getTrack('2024-10-29', '2024-10-31');
+        // return VcstTrack::query()
+        //     //return null
+        //     ->where('JOB_NO', 'Hello World');
     }
 
     public function table(Table $table): Table
     {
+        // dd($this->id);
         return $table
             ->query(fn() => $this->getTableData())
             ->columns([
@@ -76,7 +87,17 @@ class WrDetail extends Page implements HasTable
                 // ...
             ])
             ->actions([
-                // ...
+                Action::make('wr_print')
+                    ->label('Detail')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn(VcstTrack $record): string => TransferBookMenuResource::getUrl(
+                        'wr_print',
+                        [
+                            'record' => $this->id . '@' .
+                                str_replace('/', '-', $record->JOB_NO) . "@" .
+                                $record->CPART_NO
+                        ]
+                    )),
             ])
             ->bulkActions([
                 // ...

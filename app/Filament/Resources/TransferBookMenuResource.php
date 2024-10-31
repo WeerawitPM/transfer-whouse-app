@@ -87,8 +87,7 @@ class TransferBookMenuResource extends Resource
         return [
             'index' => Pages\ListTransferBookMenus::route('/'),
             'wr_detail' => Pages\WrDetail::route('/{record}/wr_detail'),
-            // 'create' => Pages\CreateTransferBookMenu::route('/create'),
-            // 'edit' => Pages\EditTransferBookMenu::route('/{record}/edit'),
+            'wr_print' => Pages\WrPrint::route('/{record}/wr_print'),
         ];
     }
 }
