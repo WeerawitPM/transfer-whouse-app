@@ -58,10 +58,10 @@ class WrDetail extends Page implements HasTable
             return VcstTrack::getTrack($this->startDate, $this->endDate);
         }
 
-        return VcstTrack::getTrack('2024-10-29', '2024-10-31');
-        // return VcstTrack::query()
-        //     //return null
-        //     ->where('JOB_NO', 'Hello World');
+        // return VcstTrack::getTrack('2024-10-29', '2024-10-31');
+        return VcstTrack::query()
+            //return null
+            ->where('JOB_NO', 'Hello World');
     }
 
     public function table(Table $table): Table
@@ -97,7 +97,8 @@ class WrDetail extends Page implements HasTable
                                 str_replace('/', '-', $record->JOB_NO) . "@" .
                                 $record->CPART_NO
                         ]
-                    )),
+                    ))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 // ...

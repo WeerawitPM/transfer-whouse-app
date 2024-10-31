@@ -26,12 +26,23 @@ class VcstTrackDetail extends Model
     public static function getTrackDetail($job_no, $part_no)
     {
         return self::selectRaw('
-                LTRIM(RTRIM(KANBAN)) AS KANBAN,
-                LTRIM(RTRIM(CPART_NO)) AS PART_NO
+                LTRIM(RTRIM(TRACK.KANBAN)) AS KANBAN,
+                LTRIM(RTRIM(TRACK.CPART_NO)) AS PART_NO,
+                LTRIM(RTRIM(P.FCSNAME)) AS PART_CODE,
+                LTRIM(RTRIM(P.FCNAME)) AS PART_NAME,
+                LTRIM(RTRIM(K.CMODEL)) AS MODEL,
+                LTRIM(RTRIM(K.CPICTURE)) AS PICTURE
             ')
-            ->where('JOB_NO', $job_no)
-            ->where('CPART_NO', $part_no)
-            ->where('STEP', 1)
-            ->where('STATUS', 1);
+            ->join('FORMULA.dbo.PROD AS P', function ($join) {
+                $join->on(DB::raw('LTRIM(RTRIM(TRACK.CPART_NO))'), '=', DB::raw('LTRIM(RTRIM(P.FCCODE))'));
+            })
+            ->join('VCST.dbo.KANBAN AS K', function ($join) {
+                $join->on(DB::raw('LTRIM(RTRIM(TRACK.CPART_NO))'), '=', DB::raw('LTRIM(RTRIM(K.CPART_NO))'));
+            })
+            ->where('TRACK.JOB_NO', $job_no)
+            ->where('TRACK.CPART_NO', $part_no)
+            ->where('TRACK.STEP', 1)
+            ->where('TRACK.STATUS', 1);
     }
+
 }

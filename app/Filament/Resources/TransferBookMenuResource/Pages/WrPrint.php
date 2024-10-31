@@ -9,7 +9,8 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Route;
+use Filament\Pages\Actions\ButtonAction;
 
 class WrPrint extends Page implements HasTable
 {
@@ -20,6 +21,27 @@ class WrPrint extends Page implements HasTable
 
     public $job_no;
     public $part_no;
+    public $id; // Property to hold the ID
+
+    // Override the mount method to access the request
+    public function mount()
+    {
+        $this->id = Route::current()->parameter('record'); // Get the ID from the route parameters
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            ButtonAction::make('print_document')
+                ->label('Print Document')
+                ->color('primary')
+                ->icon('heroicon-o-printer'),
+            ButtonAction::make('print_tag')
+                ->label('Print Tag')
+                ->color('primary')
+                ->icon('heroicon-o-printer'),
+        ];
+    }
 
     protected function getTableData()
     {
@@ -28,7 +50,7 @@ class WrPrint extends Page implements HasTable
             return VcstTrackDetail::getTrackDetail($this->job_no, $this->part_no);
         }
 
-        return VcstTrackDetail::getTrackDetail('JOB202410/1690', '5T078-6310-7');
+        return VcstTrackDetail::getTrackDetail('JOB202410/01', 'PROD001');
         // return VcstTrack::query()
         //     //return null
         //     ->where('JOB_NO', 'Hello World');
@@ -57,17 +79,7 @@ class WrPrint extends Page implements HasTable
                 // ...
             ])
             ->actions([
-                // Action::make('wr_print')
-                //     ->label('Detail')
-                //     ->icon('heroicon-o-eye')
-                //     ->url(fn(VcstTrack $record): string => TransferBookMenuResource::getUrl(
-                //         'wr_print',
-                //         [
-                //             'record' => $this->id . '@' .
-                //                 str_replace('/', '-', $record->JOB_NO) . "@" .
-                //                 $record->CPART_NO
-                //         ]
-                //     )),
+                //
             ])
             ->bulkActions([
                 // ...
