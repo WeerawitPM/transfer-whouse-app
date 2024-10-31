@@ -42,23 +42,35 @@ class WrDetail extends Page implements HasTable
         ];
     }
 
-    protected function getTableColumns(): array
+    protected function getTableData()
     {
-        return [
-            TextColumn::make('FCCODE'),
-        ];
+        // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
+        if ($this->startDate && $this->endDate) {
+            return VcstTrack::getTrack($this->startDate, $this->endDate);
+        }
+
+        return VcstTrack::query()
+            //return null
+            ->where('JOB_NO', 'Hello World');
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                VcstTrack::query()
-                    ->where('STEP', 1) // กรองเฉพาะข้อมูลที่ต้องการ
-                    ->limit(1000) // จำกัดที่ 1000 รายการ
-            )
+            ->query(fn() => $this->getTableData())
             ->columns([
-                TextColumn::make('KANBAN'),
+                TextColumn::make('JOB_NO')
+                    ->sortable(),
+                TextColumn::make('CPART_NO')
+                    ->sortable(),
+                TextColumn::make('FCSNAME')
+                    ->sortable(),
+                TextColumn::make('FCNAME')
+                    ->sortable(),
+                TextColumn::make('STARTDATE')->date('Y-m-d')
+                    ->sortable(),
+                TextColumn::make('ENDDATE')->date('Y-m-d')
+                    ->sortable(),
             ])
             ->filters([
                 // ...
@@ -71,17 +83,6 @@ class WrDetail extends Page implements HasTable
             ]);
     }
 
-    // protected function getActions(): array
-    // {
-    //     return [
-    //         ButtonAction::make('submit')
-    //             ->label('Submit')
-    //             ->action('submit')
-    //             ->color('primary')
-    //             ->icon('heroicon-o-check'),
-    //     ];
-    // }
-
     public function submit()
     {
         $this->validate([
@@ -92,6 +93,6 @@ class WrDetail extends Page implements HasTable
         ]);
 
         // Add the logic to handle form submission
-        dd($this->endDate);
+        // dd($this->endDate);
     }
 }
