@@ -27,6 +27,7 @@ class WrPrint extends Page implements HasTable
     public function mount()
     {
         $this->id = Route::current()->parameter('record'); // Get the ID from the route parameters
+        // dd($this->id);
     }
 
     protected function getActions(): array
