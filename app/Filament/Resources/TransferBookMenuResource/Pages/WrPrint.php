@@ -3,8 +3,11 @@
 namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
+use App\Models\JobDetail;
 use App\Models\SetupTag;
 use App\Models\VcstTrackDetail;
+use App\Models\JobHead;
+use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -53,16 +56,27 @@ class WrPrint extends Page implements HasTable
 
     protected function getActions(): array
     {
-        return [
-            ButtonAction::make('print_document')
-                ->label('Print Document')
-                ->color('primary')
-                ->icon('heroicon-o-printer'),
-            ButtonAction::make('print_tag')
-                ->label('Print Tag')
-                ->color('primary')
-                ->icon('heroicon-o-printer'),
-        ];
+        $job_head = JobHead::query()->where('job_no', $this->job_no)->first();
+        if ($job_head) {
+            return [
+                ButtonAction::make('print_document')
+                    ->label('Print Document')
+                    ->color('primary')
+                    ->icon('heroicon-o-printer'),
+                ButtonAction::make('print_tag')
+                    ->label('Print Tag')
+                    ->color('primary')
+                    ->icon('heroicon-o-printer'),
+            ];
+        } else {
+            return [
+                ButtonAction::make('generate_document')
+                    ->label('Generate Document')
+                    ->color('primary')
+                    ->icon('heroicon-o-printer')
+                    ->action('generate_document'),
+            ];
+        }
     }
 
     protected function getTableData()
@@ -116,5 +130,32 @@ class WrPrint extends Page implements HasTable
             ->bulkActions([
                 // ...
             ]);
+    }
+
+    public function generate_document()
+    {
+
+        dd($this->getTableData()->get());
+        $from_whs_get = TransferBook::query()
+            ->where('id', $this->transfer_book_id)
+            ->with('book.from_whs')
+            ->first();
+        $from_whs = $from_whs_get->book->from_whs->FCCODE ?? null;
+
+        $to_whs_get = TransferBook::query()
+            ->where('id', $this->transfer_book_id)
+            ->with('book.to_whs')
+            ->first();
+        $to_whs = $to_whs_get->book->to_whs->FCCODE ?? null;
+
+        $jobHead = JobHead::firstOrCreate(
+            ['job_no' => $this->job_no],
+            [
+                'doc_no' => $this->job_no,
+                'doc_ref_no' => $this->job_no,
+                'from_whs' => $from_whs,
+                'to_whs' => $to_whs,
+            ]
+        );
     }
 }
