@@ -27,11 +27,11 @@ class VcstTrackDetail extends Model
     {
         return self::selectRaw('
                 LTRIM(RTRIM(TRACK.KANBAN)) AS KANBAN,
-                LTRIM(RTRIM(TRACK.CPART_NO)) AS PART_NO,
-                LTRIM(RTRIM(P.FCSNAME)) AS PART_CODE,
-                LTRIM(RTRIM(P.FCNAME)) AS PART_NAME,
-                LTRIM(RTRIM(K.CMODEL)) AS MODEL,
-                LTRIM(RTRIM(K.CPICTURE)) AS PICTURE
+                LTRIM(RTRIM(TRACK.CPART_NO)) AS CPART_NO,
+                LTRIM(RTRIM(P.FCSNAME)) AS FCSNAME,
+                LTRIM(RTRIM(P.FCNAME)) AS FCNAME,
+                LTRIM(RTRIM(K.CMODEL)) AS CMODEL,
+                LTRIM(RTRIM(K.CPICTURE)) AS CPICTURE
             ')
             ->join('FORMULA.dbo.PROD AS P', function ($join) {
                 $join->on(DB::raw('LTRIM(RTRIM(TRACK.CPART_NO))'), '=', DB::raw('LTRIM(RTRIM(P.FCCODE))'));

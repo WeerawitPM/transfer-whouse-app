@@ -11,6 +11,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Route;
 use Filament\Pages\Actions\ButtonAction;
+use Filament\Tables\Columns\ImageColumn;
 
 class WrPrint extends Page implements HasTable
 {
@@ -77,20 +78,25 @@ class WrPrint extends Page implements HasTable
     {
         // dd($this->id);
         return $table
+            ->paginated(false)
             ->query(fn() => $this->getTableData())
             ->columns([
                 TextColumn::make('KANBAN')
+                    ->label('KANBAN')
                     ->sortable(),
-                TextColumn::make('PART_NO')
+                TextColumn::make('CPART_NO')
+                    ->label('Part No')
                     ->sortable(),
-                TextColumn::make('PART_CODE')
+                TextColumn::make('FCSNAME')
+                    ->label('Part Code')
                     ->sortable(),
-                TextColumn::make('PART_NAME')
+                TextColumn::make('FCNAME')
+                    ->label('Part Name')
                     ->sortable(),
-                TextColumn::make('MODEL')
+                TextColumn::make('CMODEL')
+                    ->label('Model')
                     ->sortable(),
-                TextColumn::make('PICTURE')
-                    ->sortable(),
+                ImageColumn::make('image')
             ])
             ->filters([
                 // ...
