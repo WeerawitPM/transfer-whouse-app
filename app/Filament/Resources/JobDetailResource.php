@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\ImageColumn;
 
 class JobDetailResource extends Resource
 {
@@ -22,6 +23,8 @@ class JobDetailResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('image')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('part_no')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('part_code')
@@ -62,6 +65,8 @@ class JobDetailResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                ImageColumn::make('image')
+                    ->label('image'),
                 Tables\Columns\TextColumn::make('part_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('part_code')

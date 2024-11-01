@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class JobToTag extends Model
 {
     protected $fillable = [
+        'image',
         'part_no',
         'part_code',
         'part_name',

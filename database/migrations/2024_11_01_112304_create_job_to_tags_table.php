@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('job_to_tags', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('image')->nullable();
             $table->string('part_no')->nullable();
             $table->string('part_code')->nullable();
             $table->string('part_name')->nullable();
