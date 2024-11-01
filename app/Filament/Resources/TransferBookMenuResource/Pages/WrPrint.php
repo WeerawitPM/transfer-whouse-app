@@ -19,15 +19,34 @@ class WrPrint extends Page implements HasTable
 
     protected static string $view = 'filament.resources.transfer-book-menu-resource.pages.wr-print';
 
+    public $id; // Property to hold the ID
+    public $transfer_book_id;
     public $job_no;
     public $part_no;
-    public $id; // Property to hold the ID
+
 
     // Override the mount method to access the request
     public function mount()
     {
         $this->id = Route::current()->parameter('record'); // Get the ID from the route parameters
-        // dd($this->id);
+
+        // แยกข้อมูลโดยใช้เครื่องหมาย @
+        $parts = explode('@', $this->id);
+
+        if (count($parts) === 3) {
+            $this->transfer_book_id = $parts[0];
+
+            // เปลี่ยนเครื่องหมาย "-" เป็น "/" ใน job_no
+            $this->job_no = str_replace('-', '/', $parts[1]);
+
+            $this->part_no = $parts[2];
+        }
+
+        // dd([
+        //     'transfer_book_id' => $this->transfer_book_id,
+        //     'job_no' => $this->job_no,
+        //     'part_no' => $this->part_no
+        // ]);
     }
 
     protected function getActions(): array
@@ -51,10 +70,7 @@ class WrPrint extends Page implements HasTable
             return VcstTrackDetail::getTrackDetail($this->job_no, $this->part_no);
         }
 
-        return VcstTrackDetail::getTrackDetail('JOB202410/01', 'PROD001');
-        // return VcstTrack::query()
-        //     //return null
-        //     ->where('JOB_NO', 'Hello World');
+        return VcstTrackDetail::getTrackDetail('Hello World', 'Hello World');
     }
 
     public function table(Table $table): Table
