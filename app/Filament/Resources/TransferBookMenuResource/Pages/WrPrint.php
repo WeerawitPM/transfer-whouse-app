@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
+use App\Models\SetupTag;
 use App\Models\VcstTrackDetail;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Contracts\HasTable;
@@ -66,7 +67,6 @@ class WrPrint extends Page implements HasTable
 
     protected function getTableData()
     {
-        // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
         if ($this->job_no && $this->part_no) {
             return VcstTrackDetail::getTrackDetail($this->job_no, $this->part_no);
         }
@@ -76,11 +76,21 @@ class WrPrint extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        // dd($this->id);
         return $table
             ->paginated(false)
             ->query(fn() => $this->getTableData())
             ->columns([
+                ImageColumn::make('image')
+                    ->label('image')
+                    ->getStateUsing(function ($record) {
+                        // dd($record->CPART_NO);
+                        $setupTag = SetupTag::where('FCCODE', $record->CPART_NO)->first();
+                        // dd($setupTag);
+                        if ($setupTag && $setupTag->image) {
+                            return $setupTag->image;
+                        }
+                        return asset('storage/image_part/error.jpg');
+                    }),
                 TextColumn::make('KANBAN')
                     ->label('KANBAN')
                     ->sortable(),
@@ -96,7 +106,6 @@ class WrPrint extends Page implements HasTable
                 TextColumn::make('CMODEL')
                     ->label('Model')
                     ->sortable(),
-                ImageColumn::make('image')
             ])
             ->filters([
                 // ...

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class VcstTrack extends Model
 {
     // ระบุการเชื่อมต่อฐานข้อมูล
-    protected $connection = 'kanban';
+    protected $connection = 'vcst';
 
     // ชื่อของตารางที่ต้องการเชื่อมโยง
     protected $table = 'TRACK';
@@ -61,7 +61,7 @@ class VcstTrack extends Model
             ->where('STEP', 1)
             ->where('STATUS', 1)
             ->whereNotNull('ENDDATE')
-            ->where(DB::raw('CONVERT(date, STARTDATE, 103)'), '=', $start_date)
+            // ->where(DB::raw('CONVERT(date, STARTDATE, 103)'), '=', $start_date)
             ->whereBetween(DB::raw('CONVERT(date, ENDDATE, 103)'), [$start_date, $end_date])
             ->groupBy('JOB_NO', 'CPART_NO', 'P.FCSNAME', 'P.FCNAME');
     }

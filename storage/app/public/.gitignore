@@ -1,2 +1,4 @@
 *
 !.gitignore
+!image_part
+!image_part/error.jpg

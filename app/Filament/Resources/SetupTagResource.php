@@ -16,6 +16,7 @@ class SetupTagResource extends Resource
     protected static ?string $model = SetupTag::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Setup';
 
     public static function form(Form $form): Form
     {
@@ -64,9 +65,9 @@ class SetupTagResource extends Resource
         $formulaProd = FormulaProd::find($fcskid);
 
         if ($formulaProd) {
-            $set('FCCODE', $formulaProd->FCCODE);
-            $set('FCSNAME', $formulaProd->FCSNAME);
-            $set('FCNAME', $formulaProd->FCNAME);
+            $set('FCCODE', trim($formulaProd->FCCODE));
+            $set('FCSNAME', trim($formulaProd->FCSNAME));
+            $set('FCNAME', trim($formulaProd->FCNAME));
         }
     }
 

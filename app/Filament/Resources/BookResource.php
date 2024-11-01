@@ -72,9 +72,11 @@ class BookResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCACCBOOK')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('from_whs.FCCODE')
+                Tables\Columns\TextColumn::make('from_whs')
+                    ->formatStateUsing(fn(Book $record) => "{$record->from_whs->FCCODE} {$record->from_whs->FCNAME}")
                     ->sortable(),
-                Tables\Columns\TextColumn::make('to_whs.FCCODE')
+                Tables\Columns\TextColumn::make('to_whs')
+                    ->formatStateUsing(fn(Book $record) => "{$record->to_whs->FCCODE} {$record->to_whs->FCNAME}")
                     ->sortable(),
             ])
             ->filters([

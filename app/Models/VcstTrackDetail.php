@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class VcstTrackDetail extends Model
 {
     // ระบุการเชื่อมต่อฐานข้อมูล
-    protected $connection = 'kanban';
+    protected $connection = 'vcst';
 
     // ชื่อของตารางที่ต้องการเชื่อมโยง
     protected $table = 'TRACK';
