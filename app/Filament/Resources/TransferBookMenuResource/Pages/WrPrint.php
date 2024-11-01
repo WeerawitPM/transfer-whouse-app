@@ -28,6 +28,7 @@ class WrPrint extends Page implements HasTable
     public $transfer_book_id;
     public $job_no;
     public $part_no;
+    public array $image_part;
 
 
     // Override the mount method to access the request
@@ -101,8 +102,10 @@ class WrPrint extends Page implements HasTable
                         $setupTag = SetupTag::where('FCCODE', $record->CPART_NO)->first();
                         // dd($setupTag);
                         if ($setupTag && $setupTag->image) {
+                            $this->image_part[] = asset('storage/' . $setupTag->image);
                             return $setupTag->image;
                         }
+                        $this->image_part[] = asset('storage/image_part/error.jpg');
                         return asset('storage/image_part/error.jpg');
                     }),
                 TextColumn::make('KANBAN')
@@ -134,28 +137,28 @@ class WrPrint extends Page implements HasTable
 
     public function generate_document()
     {
+        dd($this->image_part);
+        // dd($this->getTableRecords());
+        // $from_whs_get = TransferBook::query()
+        //     ->where('id', $this->transfer_book_id)
+        //     ->with('book.from_whs')
+        //     ->first();
+        // $from_whs = $from_whs_get->book->from_whs->FCCODE ?? null;
 
-        dd($this->getTableData()->get());
-        $from_whs_get = TransferBook::query()
-            ->where('id', $this->transfer_book_id)
-            ->with('book.from_whs')
-            ->first();
-        $from_whs = $from_whs_get->book->from_whs->FCCODE ?? null;
+        // $to_whs_get = TransferBook::query()
+        //     ->where('id', $this->transfer_book_id)
+        //     ->with('book.to_whs')
+        //     ->first();
+        // $to_whs = $to_whs_get->book->to_whs->FCCODE ?? null;
 
-        $to_whs_get = TransferBook::query()
-            ->where('id', $this->transfer_book_id)
-            ->with('book.to_whs')
-            ->first();
-        $to_whs = $to_whs_get->book->to_whs->FCCODE ?? null;
-
-        $jobHead = JobHead::firstOrCreate(
-            ['job_no' => $this->job_no],
-            [
-                'doc_no' => $this->job_no,
-                'doc_ref_no' => $this->job_no,
-                'from_whs' => $from_whs,
-                'to_whs' => $to_whs,
-            ]
-        );
+        // $jobHead = JobHead::firstOrCreate(
+        //     ['job_no' => $this->job_no],
+        //     [
+        //         'doc_no' => $this->job_no,
+        //         'doc_ref_no' => $this->job_no,
+        //         'from_whs' => $from_whs,
+        //         'to_whs' => $to_whs,
+        //     ]
+        // );
     }
 }
