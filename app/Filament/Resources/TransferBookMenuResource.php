@@ -69,9 +69,9 @@ class TransferBookMenuResource extends Resource
                 // Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('wr_detail')
                     ->label('Detail')
-                    // ->icon('heroicon-o-eye')
-                    ->url(fn(TransferBook $record): string =>  self::getUrl('wr_detail', ['record' => $record])),
-                    // ->openUrlInNewTab()
+                    ->url(fn(TransferBook $record): string => self::getUrl('wr_detail', ['record' => $record]))
+                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE === 'WR'),
+                // ->openUrlInNewTab()
             ]);
     }
 
