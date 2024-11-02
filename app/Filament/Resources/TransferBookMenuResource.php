@@ -66,7 +66,14 @@ class TransferBookMenuResource extends Resource
                     ->attribute('transfer_ref_type_id')
             ])
             ->actions([
-                // Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('scan_tag')
+                    ->label('Scan Tag')
+                    ->url(fn(TransferBook $record): string => self::getUrl('scan_tag', ['record' => $record]))
+                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
+                Tables\Actions\Action::make('manual')
+                    ->label('Manual')
+                    ->url(fn(TransferBook $record): string => self::getUrl('manual', ['record' => $record]))
+                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
                 Tables\Actions\Action::make('wr_detail')
                     ->label('Detail')
                     ->url(fn(TransferBook $record): string => self::getUrl('wr_detail', ['record' => $record]))
@@ -88,6 +95,8 @@ class TransferBookMenuResource extends Resource
             'index' => Pages\ListTransferBookMenus::route('/'),
             'wr_detail' => Pages\WrDetail::route('/{record}/wr_detail'),
             'wr_print' => Pages\WrPrint::route('/{record}/wr_print'),
+            'scan_tag' => Pages\ScanTag::route('/{record}/scan_tag'),
+            'manual' => Pages\Manual::route('/{record}/manual'),
         ];
     }
 }
