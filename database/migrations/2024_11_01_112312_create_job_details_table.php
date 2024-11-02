@@ -14,11 +14,13 @@ return new class extends Migration {
             $table->id();
             $table->timestamps();
             $table->string('image')->nullable();
+            $table->string('kanban')->nullable();
             $table->string('part_no')->nullable();
             $table->string('part_code')->nullable();
             $table->string('part_name')->nullable();
             $table->string('model')->nullable();
             $table->integer('qty')->nullable();
+            $table->string('packing_name')->nullable();
             $table->string('whouse')->nullable();
             $table->string('from_whs')->nullable();
             $table->string('to_whs')->nullable();

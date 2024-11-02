@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('setup_tags', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('FCSKID');
+            $table->string('FCSKID')->unique();
             $table->string('FCCODE')
                 ->nullable();
             $table->string('FCSNAME')

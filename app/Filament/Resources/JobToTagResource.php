@@ -25,6 +25,8 @@ class JobToTagResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('image')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('kanban')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('part_no')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('part_code')
@@ -35,6 +37,8 @@ class JobToTagResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('qty')
                     ->numeric(),
+                Forms\Components\TextInput::make('packing_name')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('whouse')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('from_whs')
@@ -67,6 +71,8 @@ class JobToTagResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 ImageColumn::make('image')
                     ->label('image'),
+                Tables\Columns\TextColumn::make('kanban')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('part_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('part_code')
@@ -78,6 +84,8 @@ class JobToTagResource extends Resource
                 Tables\Columns\TextColumn::make('qty')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('packing_name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('whouse')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('from_whs')

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
 use App\Models\JobDetail;
+use App\Models\JobToTag;
 use App\Models\SetupTag;
 use App\Models\VcstTrackDetail;
 use App\Models\JobHead;
@@ -28,8 +29,6 @@ class WrPrint extends Page implements HasTable
     public $transfer_book_id;
     public $job_no;
     public $part_no;
-    public array $image_part;
-
 
     // Override the mount method to access the request
     public function mount()
@@ -102,14 +101,13 @@ class WrPrint extends Page implements HasTable
                         $setupTag = SetupTag::where('FCCODE', $record->CPART_NO)->first();
                         // dd($setupTag);
                         if ($setupTag && $setupTag->image) {
-                            $this->image_part[] = asset('storage/' . $setupTag->image);
                             return $setupTag->image;
                         }
-                        $this->image_part[] = asset('storage/image_part/error.jpg');
                         return asset('storage/image_part/error.jpg');
                     }),
                 TextColumn::make('KANBAN')
                     ->label('KANBAN')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('CPART_NO')
                     ->label('Part No')
@@ -123,6 +121,12 @@ class WrPrint extends Page implements HasTable
                 TextColumn::make('CMODEL')
                     ->label('Model')
                     ->sortable(),
+                TextColumn::make('qty')
+                    ->label('Quantity')
+                    ->getStateUsing(function ($record) {
+                        $data = explode(',', $record->KANBAN);
+                        return isset($data[1]) ? $data[1] : 'N/A';
+                    }),
             ])
             ->filters([
                 // ...
@@ -137,7 +141,7 @@ class WrPrint extends Page implements HasTable
 
     public function generate_document()
     {
-        dd($this->image_part);
+        // dd($this->image_part);
         // dd($this->getTableRecords());
         // $from_whs_get = TransferBook::query()
         //     ->where('id', $this->transfer_book_id)
@@ -160,5 +164,33 @@ class WrPrint extends Page implements HasTable
         //         'to_whs' => $to_whs,
         //     ]
         // );
+
+        $this->saveJobToTag();
+    }
+
+    public function saveJobToTag()
+    {
+        $data = $this->getTableRecords()->toArray();
+
+        foreach ($data as $item) {
+            $setupTag = SetupTag::where('FCCODE', $item['CPART_NO'])->first();
+            if ($setupTag && $setupTag->image) {
+                $item['image'] = asset('storage/' . $setupTag->image);
+            } else {
+                $item['image'] = asset('storage/image_part/error.jpg');
+            }
+            $kanban = explode(',', $item['KANBAN']);
+            $qty = isset($kanban[1]) ? $kanban[1] : 0;
+            $packing_name = isset($kanban[2]) ? $kanban[2] : 0;
+
+            dd($item);
+            // $jobToTag = JobToTag::create([
+            //     'image' => $item['image'],
+            //     'part_no' => $item['CPART_NO'],
+            //     'part_code' => $item['FCSNAME'],
+            //     'part_name' => $item['FCNAME'],
+            //     'model' => $item['CMODEL'],
+            // ]);
+        }
     }
 }

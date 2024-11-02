@@ -8,11 +8,13 @@ class JobDetail extends Model
 {
     protected $fillable = [
         'image',
+        'kanban',
         'part_no',
         'part_code',
         'part_name',
         'model',
         'qty',
+        'packing_name',
         'whouse',
         'from_whs',
         'to_whs',
