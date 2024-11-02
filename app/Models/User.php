@@ -22,6 +22,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'first_name',
+        'last_name',
+        'emp_id',
+        'image',
+        'corp_id',
+        'dept_id',
+        'sect_id',
+        'emplr_id',
     ];
 
     /**
@@ -45,5 +53,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function corp()
+    {
+        return $this->belongsTo(Corp::class, 'corp_id');
+    }
+
+    public function dept()
+    {
+        return $this->belongsTo(Dept::class, 'dept_id');
+    }
+
+    public function sect()
+    {
+        return $this->belongsTo(sect::class, 'sect_id');
+    }
+
+    public function emplr()
+    {
+        return $this->belongsTo(emplr::class, 'emplr_id');
     }
 }
