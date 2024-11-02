@@ -17,6 +17,8 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Route;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Notifications\Notification;
+use Auth;
 
 class WrPrint extends Page implements HasTable
 {
@@ -141,34 +143,49 @@ class WrPrint extends Page implements HasTable
 
     public function generate_document()
     {
-        // dd($this->image_part);
-        // dd($this->getTableRecords());
-        // $from_whs_get = TransferBook::query()
-        //     ->where('id', $this->transfer_book_id)
-        //     ->with('book.from_whs')
-        //     ->first();
-        // $from_whs = $from_whs_get->book->from_whs->FCCODE ?? null;
+        $from_whs_get = TransferBook::query()
+            ->where('id', $this->transfer_book_id)
+            ->with('book.from_whs')
+            ->first();
+        $from_whs = $from_whs_get->book->from_whs->FCCODE ?? null;
 
-        // $to_whs_get = TransferBook::query()
-        //     ->where('id', $this->transfer_book_id)
-        //     ->with('book.to_whs')
-        //     ->first();
-        // $to_whs = $to_whs_get->book->to_whs->FCCODE ?? null;
+        $to_whs_get = TransferBook::query()
+            ->where('id', $this->transfer_book_id)
+            ->with('book.to_whs')
+            ->first();
+        $to_whs = $to_whs_get->book->to_whs->FCCODE ?? null;
 
-        // $jobHead = JobHead::firstOrCreate(
-        //     ['job_no' => $this->job_no],
-        //     [
-        //         'doc_no' => $this->job_no,
-        //         'doc_ref_no' => $this->job_no,
-        //         'from_whs' => $from_whs,
-        //         'to_whs' => $to_whs,
-        //     ]
-        // );
+        $whouse = '';
+        if ($to_whs == 'XXX') {
+            $whouse = '005';
+        }
 
-        $this->saveJobToTag();
+        $user_id = Auth::user()->id;
+        $created_date = date('Y-m-d');
+
+        $jobHead = JobHead::firstOrCreate(
+            ['job_no' => $this->job_no],
+            [
+                'doc_no' => $this->job_no,
+                'doc_ref_no' => $this->job_no,
+                'from_whs' => $from_whs,
+                'to_whs' => $to_whs,
+                'status' => 0,
+                'created_date' => $created_date,
+                'user_id' => $user_id,
+            ]
+        );
+        $jobHead->save();
+
+        $this->saveJobToTag($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date);
+
+        Notification::make()
+            ->title('Saved successfully')
+            ->success()
+            ->send();
     }
 
-    public function saveJobToTag()
+    public function saveJobToTag($job_id, $from_whs, $to_whs, $whouse, $user_id, $created_date)
     {
         $data = $this->getTableRecords()->toArray();
 
@@ -183,14 +200,27 @@ class WrPrint extends Page implements HasTable
             $qty = isset($kanban[1]) ? $kanban[1] : 0;
             $packing_name = isset($kanban[2]) ? $kanban[2] : 0;
 
-            dd($item);
-            // $jobToTag = JobToTag::create([
-            //     'image' => $item['image'],
-            //     'part_no' => $item['CPART_NO'],
-            //     'part_code' => $item['FCSNAME'],
-            //     'part_name' => $item['FCNAME'],
-            //     'model' => $item['CMODEL'],
-            // ]);
+            // dd($item);
+            $jobToTag = JobToTag::create([
+                'image' => $item['image'],
+                'kanban' => $item['KANBAN'],
+                'part_no' => $item['CPART_NO'],
+                'part_code' => $item['FCSNAME'],
+                'part_name' => $item['FCNAME'],
+                'model' => $item['CMODEL'],
+                'qty' => $qty,
+                'packing_name' => $packing_name,
+                'whouse' => $whouse,
+                'from_whs' => $from_whs,
+                'to_whs' => $to_whs,
+                'status' => 0,
+                'job_id' => $job_id,
+                'created_date' => $created_date,
+                'user_id' => $user_id,
+            ]);
+            $qr_code = $jobToTag->part_no . '@' . $jobToTag->qty . '@' . $jobToTag->packing_name . '@' . $jobToTag->whouse . '@' . $jobToTag->id;
+            $jobToTag->qr_code = $qr_code;
+            $jobToTag->save();
         }
     }
 }

@@ -28,7 +28,7 @@ class JobToTag extends Model
 
     public function job_head()
     {
-        return $this->belongsTo(JobHead::class);
+        return $this->belongsTo(JobHead::class, 'job_id');
     }
 
     public function user()

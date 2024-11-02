@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->string('whouse')->nullable();
             $table->string('from_whs')->nullable();
             $table->string('to_whs')->nullable();
+            $table->string('qr_code')->nullable();
             $table->integer('status')->nullable();
             $table->string('remark')->nullable();
             $table->foreignId('job_id')
