@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
+use App\Models\JobDetail;
+use App\Models\JobHead;
 use App\Models\JobToTag;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Route;
@@ -36,7 +38,7 @@ class ScanTag extends Page implements HasTable
             ButtonAction::make('btn_save')
                 ->label('Save')
                 ->color('primary')
-                ->action('save')
+                ->action('handleSave')
             // ->icon('heroicon-o-cloud'),
         ];
     }
@@ -115,9 +117,76 @@ class ScanTag extends Page implements HasTable
             ]);
     }
 
-    public function save()
+    public function handleSave()
     {
-        $data = $this->getTableRecords();
-        dd($data);
+        // ดึงข้อมูลจาก JobToTag และ JobDetail
+        $jobToTag = $this->getTableRecords()->toArray();
+        $job_id = $jobToTag[0]['job_id'];
+        $jobDetail = JobDetail::query()->where('job_id', $job_id)->get()->toArray();
+
+        // สร้าง array เพื่อเก็บจำนวนรวมของแต่ละ part_no ใน JobToTag
+        $jobToTagQuantities = [];
+        foreach ($jobToTag as $tag) {
+            $partNo = $tag['part_no'];
+            $qty = $tag['qty'];
+
+            // รวม qty สำหรับ part_no เดียวกัน
+            if (isset($jobToTagQuantities[$partNo])) {
+                $jobToTagQuantities[$partNo] += $qty;
+            } else {
+                $jobToTagQuantities[$partNo] = $qty;
+            }
+        }
+
+        // ตรวจสอบว่า qty ใน JobDetails ตรงกับ qty รวมใน JobToTag หรือไม่
+        $isComplete = true;
+        foreach ($jobDetail as $detail) {
+            $partNo = $detail['part_no'];
+            $requiredQty = $detail['qty'];
+
+            // ตรวจสอบว่ามีจำนวนรวมที่ตรงกับ JobDetails หรือไม่
+            if (!isset($jobToTagQuantities[$partNo]) || $jobToTagQuantities[$partNo] != $requiredQty) {
+                $isComplete = false;
+                break;
+            }
+        }
+
+        // แสดงผลลัพธ์การตรวจสอบ
+        if ($isComplete) {
+            $this->handleUpdateJobHead($job_id);
+            $this->handleUpdateJobToTag($jobToTag);
+            $this->handleUpdateJobDetail($jobDetail);
+            Notification::make()
+                ->title('Scan tag ครบแล้ว')
+                ->success()
+                ->send();
+        } else {
+            Notification::make()
+                ->title('Scan tag ไม่ครบ')
+                ->warning()
+                ->send();
+        }
+
+        // Debug ข้อมูล
+        // dd($jobToTag, $jobDetail, $jobToTagQuantities, $isComplete);
+    }
+
+    public function handleUpdateJobHead($job_id)
+    {
+        JobHead::where('job_no', $job_id)->update(['status' => 1]);
+    }
+
+    public function handleUpdateJobToTag($jobToTag)
+    {
+        foreach ($jobToTag as $tag) {
+            JobToTag::where('id', $tag['id'])->update(['status' => 1]);
+        }
+    }
+
+    public function handleUpdateJobDetail($jobDetail)
+    {
+        foreach ($jobDetail as $tag) {
+            JobDetail::where('id', $tag['id'])->update(['status' => 1]);
+        }
     }
 }
