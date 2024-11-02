@@ -76,7 +76,13 @@ class WrPrint extends Page implements HasTable
                     ->label('Generate Document')
                     ->color('primary')
                     ->icon('heroicon-o-printer')
-                    ->action('generate_document'),
+                    // ->action(function () {
+                    //     $this->generate_document();
+                    // })
+                    ->extraAttributes([
+                        'id' => 'generate_document',
+                        'onclick' => 'disableButton()',
+                    ])
             ];
         }
     }
@@ -161,6 +167,7 @@ class WrPrint extends Page implements HasTable
         }
 
         $user_id = Auth::user()->id;
+        $department = Auth::user()->dept->FCNAME;
         $created_date = date('Y-m-d');
 
         $jobHead = JobHead::firstOrCreate(
@@ -168,6 +175,7 @@ class WrPrint extends Page implements HasTable
             [
                 'doc_no' => $this->job_no,
                 'doc_ref_no' => $this->job_no,
+                'department' => $department,
                 'from_whs' => $from_whs,
                 'to_whs' => $to_whs,
                 'status' => 0,
@@ -178,11 +186,17 @@ class WrPrint extends Page implements HasTable
         $jobHead->save();
 
         $this->saveJobToTag($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date);
+        $this->saveJobDetail($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date);
 
         Notification::make()
             ->title('Saved successfully')
             ->success()
             ->send();
+
+        $url = $this->getUrl([$this->id]);
+        // dd($url);
+
+        return redirect($url);
     }
 
     public function saveJobToTag($job_id, $from_whs, $to_whs, $whouse, $user_id, $created_date)
@@ -221,6 +235,40 @@ class WrPrint extends Page implements HasTable
             $qr_code = $jobToTag->part_no . '@' . $jobToTag->qty . '@' . $jobToTag->packing_name . '@' . $jobToTag->whouse . '@' . $jobToTag->id;
             $jobToTag->qr_code = $qr_code;
             $jobToTag->save();
+        }
+    }
+
+    public function saveJobDetail($job_id, $from_whs, $to_whs, $whouse, $user_id, $created_date)
+    {
+        $data = JobToTag::where('job_id', $job_id)->get();
+        $groupedData = $data->groupBy('part_no');
+
+        foreach ($groupedData as $part_no => $items) {
+            $image = $items->first()->image;
+            $kanban = $items->first()->kanban;
+            $part_code = $items->first()->part_code;
+            $part_name = $items->first()->part_name;
+            $model = $items->first()->model;
+            $totalQty = $items->sum('qty');
+            $packing_name = $items->first()->packing_name;
+
+            JobDetail::create([
+                'image' => $image,
+                'kanban' => $kanban,
+                'part_no' => $part_no,
+                'part_code' => $part_code,
+                'part_name' => $part_name,
+                'model' => $model,
+                'qty' => $totalQty,
+                'packing_name' => $packing_name,
+                'whouse' => $whouse,
+                'from_whs' => $from_whs,
+                'to_whs' => $to_whs,
+                'status' => 0,
+                'job_id' => $job_id,
+                'created_date' => $created_date,
+                'user_id' => $user_id,
+            ]);
         }
     }
 }

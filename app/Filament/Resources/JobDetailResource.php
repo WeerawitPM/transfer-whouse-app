@@ -71,6 +71,8 @@ class JobDetailResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 ImageColumn::make('image')
                     ->label('image'),
+                Tables\Columns\TextColumn::make('job_head.job_no')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('kanban')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('part_no')
@@ -97,8 +99,6 @@ class JobDetailResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('remark')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('job_head.job_no')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_date')
                     ->date()
                     ->sortable(),
