@@ -173,7 +173,8 @@ class ScanTag extends Page implements HasTable
 
     public function handleUpdateJobHead($job_id)
     {
-        JobHead::where('job_no', $job_id)->update(['status' => 1]);
+        JobHead::where('id', $job_id)->update(['status' => 1]);
+        dd($job_id, JobHead::where('id', $job_id)->first()->get());
     }
 
     public function handleUpdateJobToTag($jobToTag)
