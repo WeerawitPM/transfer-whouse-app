@@ -91,11 +91,14 @@ class Manual extends Page implements HasTable
                 TextColumn::make('CPART_NAME')
                     ->label('Part Name')
                     ->sortable(),
-                TextColumn::make('Model')
+                TextColumn::make('MODEL')
+                    ->label('Model')
                     ->sortable(),
-                TextColumn::make('SModel')
+                TextColumn::make('SMODEL')
+                    ->label('SModel')
                     ->sortable(),
-                TextColumn::make('Stock Qty')
+                TextColumn::make('STOCKQTY')
+                    ->label('Stock Qty')
                     ->numeric()
                     ->sortable(),
             ])
