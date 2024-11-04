@@ -2,3 +2,5 @@
 !.gitignore
 !image_part
 !image_part/error.jpg
+!image
+!image/logo.png

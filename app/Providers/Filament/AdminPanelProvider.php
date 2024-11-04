@@ -24,7 +24,11 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->brandName("VGROUP")
+            // ->brandName("V-GROUP")
+            // ->brandLogo(asset("storage/image/logo.png"))
+            // ->brandLogoHeight('2rem')
+            ->brandLogo(fn() => view('filament.admin.logo'))
+            ->favicon(asset('storage/image/logo.png'))
             ->id('admin')
             ->path('admin')
             ->login()
