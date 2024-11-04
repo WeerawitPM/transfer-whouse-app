@@ -85,7 +85,8 @@ class TransferBookMenuResource extends Resource
                     ->url(fn(TransferBook $record): string => self::getUrl('wr_detail', ['record' => $record]))
                     ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE === 'WR'),
                 // ->openUrlInNewTab()
-            ]);
+            ])
+            ->striped();
     }
 
     public static function getRelations(): array

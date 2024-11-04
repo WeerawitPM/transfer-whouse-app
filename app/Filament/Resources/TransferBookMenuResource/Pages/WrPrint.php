@@ -144,7 +144,8 @@ class WrPrint extends Page implements HasTable
             ])
             ->bulkActions([
                 // ...
-            ]);
+            ])
+            ->striped();
     }
 
     public function generate_document()
