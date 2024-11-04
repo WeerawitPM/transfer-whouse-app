@@ -24,6 +24,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            ->brandName("VGROUP")
             ->id('admin')
             ->path('admin')
             ->login()

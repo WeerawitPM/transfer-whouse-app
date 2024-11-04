@@ -34,9 +34,9 @@ class TransferBookMenuResource extends Resource
         return $table
             ->query(TransferBook::query()->where('is_active', true)) // ใช้เมธอด query ตรงๆ
             ->columns([
-                Tables\Columns\TextColumn::make('transfer_ref_type')
-                    ->formatStateUsing(fn(TransferBook $record) => "{$record->transfer_ref_type->ref_type->FCCODE} {$record->transfer_ref_type->ref_type->FCNAME}")
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('transfer_ref_type')
+                //     ->formatStateUsing(fn(TransferBook $record) => "{$record->transfer_ref_type->ref_type->FCCODE} {$record->transfer_ref_type->ref_type->FCNAME}")
+                //     ->sortable(),
                 Tables\Columns\TextColumn::make('book')
                     ->formatStateUsing(fn(TransferBook $record) => "{$record->book->FCCODE} {$record->book->FCNAME}")
                     ->sortable(),
@@ -48,8 +48,8 @@ class TransferBookMenuResource extends Resource
                     ->label('To Warehouse')
                     ->formatStateUsing(fn(TransferBook $record) => $record->book->to_whs ? "{$record->book->to_whs->FCCODE} {$record->book->to_whs->FCNAME}" : 'N/A')
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
+                // Tables\Columns\IconColumn::make('is_active')
+                //     ->boolean(),
             ])
             ->filters([
                 SelectFilter::make('transfer_ref_type')
@@ -68,14 +68,20 @@ class TransferBookMenuResource extends Resource
             ->actions([
                 Tables\Actions\Action::make('scan_tag')
                     ->label('Scan Tag')
+                    ->color('primary')
+                    ->button()
                     ->url(fn(TransferBook $record): string => self::getUrl('scan_tag', ['record' => $record]))
                     ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
                 Tables\Actions\Action::make('manual')
-                    ->label('Manual')
+                    ->label('Add Item')
+                    ->color('primary')
+                    ->button()
                     ->url(fn(TransferBook $record): string => self::getUrl('manual', ['record' => $record]))
                     ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
                 Tables\Actions\Action::make('wr_detail')
                     ->label('Detail')
+                    ->color('primary')
+                    ->button()
                     ->url(fn(TransferBook $record): string => self::getUrl('wr_detail', ['record' => $record]))
                     ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE === 'WR'),
                 // ->openUrlInNewTab()

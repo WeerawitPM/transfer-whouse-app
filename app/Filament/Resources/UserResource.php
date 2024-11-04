@@ -97,7 +97,13 @@ class UserResource extends Resource
                 Select::make('emplr_id')
                     ->label('Emplr')
                     ->options(Emplr::all()->pluck('FCLOGIN', 'id'))
-                    ->searchable()
+                    ->searchable(),
+                Select::make('roles')
+                    ->label('Role')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ]);
     }
 
