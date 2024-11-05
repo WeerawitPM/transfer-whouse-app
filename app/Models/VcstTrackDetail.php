@@ -31,6 +31,7 @@ class VcstTrackDetail extends Model
                 LTRIM(RTRIM(P.FCSNAME)) AS FCSNAME,
                 LTRIM(RTRIM(P.FCNAME)) AS FCNAME,
                 LTRIM(RTRIM(K.CMODEL)) AS CMODEL,
+                LTRIM(RTRIM(K.CPACK)) AS CPACK,
                 LTRIM(RTRIM(K.CPICTURE)) AS CPICTURE
             ')
             ->join('FORMULA.dbo.PROD AS P', function ($join) {

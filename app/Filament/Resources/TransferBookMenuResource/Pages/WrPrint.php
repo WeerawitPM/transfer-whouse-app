@@ -129,6 +129,9 @@ class WrPrint extends Page implements HasTable
                 TextColumn::make('CMODEL')
                     ->label('Model')
                     ->sortable(),
+                TextColumn::make('CPACK')
+                    ->label('Package Name')
+                    ->sortable(),
                 TextColumn::make('qty')
                     ->label('Quantity')
                     ->getStateUsing(function ($record) {

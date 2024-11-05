@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
 use App\Models\FormulaStockProd;
+use App\Models\SetupTag;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Route;
 use Filament\Tables\Contracts\HasTable;
@@ -31,6 +32,7 @@ class Manual extends Page implements HasTable
     public $fc_type = "1";
     public $cpart_no = "Hello World!"; // ตัวแปรที่จะเก็บค่า CPART_NO ที่เลือก
     public $part_selected;
+    public $packing;
 
     public function mount()
     {
@@ -44,7 +46,13 @@ class Manual extends Page implements HasTable
             ButtonAction::make('btn_save')
                 ->label('Save')
                 ->color('primary')
-                ->action('handleSave')
+                ->extraAttributes(
+                    [
+                        'id' => 'btn_save',
+                        'onclick' => 'handleSave()',
+                    ]
+                ),
+            // ->action('handleSave')
             // ->icon('heroicon-o-cloud'),
         ];
     }
@@ -62,6 +70,7 @@ class Manual extends Page implements HasTable
     {
         $this->cpart_no = $state;
         $this->resetTable();
+        $this->packing = SetupTag::all()->keyBy('FCSKID'); // สร้างคีย์ตาม FCSKID
     }
 
 
@@ -116,21 +125,13 @@ class Manual extends Page implements HasTable
                         //ตรวจสอบ stockqty ห้ามน้อยกว่าหรือ = 0
                         $invalidRecords = $records->filter(fn($record) => $record->STOCKQTY <= 0);
                         if ($invalidRecords->isNotEmpty()) {
-                            Notification::make()
-                                ->title('เกิดข้อผิดพลาด ห้ามเลือกรายการที่ stockqty เป็น 0')
-                                ->body('ข้อมูลบางรายการที่ท่านเลือกมี stockqty = 0')
-                                ->danger()
-                                ->send();
+                            $this->handleNotification('เกิดข้อผิดพลาด', 'ห้ามเลือกรายการที่ stockqty เป็น 0', 'danger');
                         }
 
                         //ตรวจสอบและแจ้งเตือนไหนกรณีที่เลือกข้อมูลเดิม
                         $duplicateRecords = $records->filter(fn($record) => collect($this->part_selected)->contains('FCSKID', $record->FCSKID));
                         if ($duplicateRecords->isNotEmpty()) {
-                            Notification::make()
-                                ->title('เกิดข้อผิดพลาด มีการเลือกข้อมูลเดิม')
-                                ->body('ข้อมูลบางรายการที่ท่านเลือก มีอยู่ในตารางแล้ว')
-                                ->warning()
-                                ->send();
+                            $this->handleNotification('เกิดข้อผิดพลาด', 'ข้อมูลบางรายการที่ท่านเลือก มีอยู่ในตารางแล้ว', 'warning');
                         }
 
                         // เพิ่มข้อมูลที่ไม่ซ้ำ
@@ -144,5 +145,31 @@ class Manual extends Page implements HasTable
                     ->deselectRecordsAfterCompletion()
             ])
             ->striped();
+    }
+
+    public function removePart($index)
+    {
+        unset($this->part_selected[$index]);
+        $this->part_selected = array_values($this->part_selected); // Re-index the array
+    }
+
+    public function handleNotification($title, $message, $status)
+    {
+        // กำหนด notification ตาม status ที่ได้รับ
+        $notification = Notification::make()
+            ->title($title)
+            ->body($message);
+
+        // ตรวจสอบสถานะ
+        if ($status === 'success') {
+            $notification->success();
+        } elseif ($status === 'warning') {
+            $notification->warning();
+        } elseif ($status === 'danger') {
+            $notification->danger();
+        }
+
+        // ส่ง notification
+        $notification->send();
     }
 }
