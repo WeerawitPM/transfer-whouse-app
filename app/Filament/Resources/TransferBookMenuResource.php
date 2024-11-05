@@ -37,17 +37,18 @@ class TransferBookMenuResource extends Resource
                 // Tables\Columns\TextColumn::make('transfer_ref_type')
                 //     ->formatStateUsing(fn(TransferBook $record) => "{$record->transfer_ref_type->ref_type->FCCODE} {$record->transfer_ref_type->ref_type->FCNAME}")
                 //     ->sortable(),
-                Tables\Columns\TextColumn::make('book')
+                Tables\Columns\TextColumn::make('book_id')
+                    ->label('Book')
                     ->formatStateUsing(fn(TransferBook $record) => "{$record->book->FCCODE} {$record->book->FCNAME}")
                     ->sortable(),
                 Tables\Columns\TextColumn::make('book.from_whs')
                     ->label('From Warehouse')
-                    ->formatStateUsing(fn(TransferBook $record) => $record->book->from_whs ? "{$record->book->from_whs->FCCODE} {$record->book->from_whs->FCNAME}" : 'N/A')
-                    ->sortable(),
+                    ->formatStateUsing(fn(TransferBook $record) => $record->book->from_whs ? "{$record->book->from_whs->FCCODE} {$record->book->from_whs->FCNAME}" : 'N/A'),
+                // ->sortable(),
                 Tables\Columns\TextColumn::make('book.to_whs')
                     ->label('To Warehouse')
-                    ->formatStateUsing(fn(TransferBook $record) => $record->book->to_whs ? "{$record->book->to_whs->FCCODE} {$record->book->to_whs->FCNAME}" : 'N/A')
-                    ->sortable(),
+                    ->formatStateUsing(fn(TransferBook $record) => $record->book->to_whs ? "{$record->book->to_whs->FCCODE} {$record->book->to_whs->FCNAME}" : 'N/A'),
+                // ->sortable(),
                 // Tables\Columns\IconColumn::make('is_active')
                 //     ->boolean(),
             ])

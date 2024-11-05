@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
@@ -171,5 +172,38 @@ class Manual extends Page implements HasTable
 
         // ส่ง notification
         $notification->send();
+    }
+
+    public function handleConfirmSave($data)
+    {
+        // dd($data);
+        foreach ($data as $item) {
+            // ค้นหาข้อมูลตาม FCSKID
+            $setupTag = SetupTag::where('FCSKID', $item['FCSKID'])->first();
+
+            if ($setupTag) {
+                // ถ้าพบข้อมูล ให้ทำการอัปเดต
+                $setupTag->update([
+                    'FCCODE' => $item['FCCODE'],
+                    'FCSNAME' => $item['FCSNAME'],
+                    'FCNAME' => $item['FCNAME'],
+                    'packing_qty' => $item['packing_qty'],
+                ]);
+            } else {
+                // ถ้าไม่พบข้อมูล ให้สร้างใหม่
+                SetupTag::create([
+                    'FCSKID' => $item['FCSKID'],
+                    'FCCODE' => $item['FCCODE'],
+                    'FCSNAME' => $item['FCSNAME'],
+                    'FCNAME' => $item['FCNAME'],
+                    'packing_qty' => $item['packing_qty'],
+                ]);
+            }
+        }
+
+        $this->handleNotification("แจ้งเตือน", "บันทึกข้อมูลสำเร็จ", "success");
+
+        $url = $this->getUrl([$this->id]);
+        return redirect($url);
     }
 }

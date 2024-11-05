@@ -1,4 +1,5 @@
 <x-filament-panels::page>
+    <!-- Table in Modal -->
     <x-filament::modal width="5xl" :close-by-clicking-away="false">
         <x-slot name="trigger" style="width: 105px">
             <x-filament::button>
@@ -19,6 +20,7 @@
         </div>
     </x-filament::modal>
 
+    <!-- Table -->
     <div class="mt-4 overflow-x-auto">
         <table id="partsTable" class="w-full table-auto bg-white dark:bg-gray-800 shadow rounded-lg">
             <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-white uppercase text-sm">
@@ -87,10 +89,29 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Modal Confirm Save-->
+    <x-filament::modal id="confirmSaveModal" width="md" :close-by-clicking-away="false">
+        <x-slot name="trigger" style="display: none;">
+            <button id="openConfirmSaveModal"></button>
+        </x-slot>
+        <x-slot name="heading">
+            ยืนยันการบันทึก
+        </x-slot>
+        <p>คุณต้องการบันทึกข้อมูลนี้ใช่หรือไม่?</p>
+        <div class="mt-4 flex justify-end gap-2">
+            <x-filament::button type="button" color="danger"
+                @click="$dispatch('close-modal', {id: 'confirmSaveModal'})">
+                ยกเลิก
+            </x-filament::button>
+            <x-filament::button type="button" color="primary" onclick="confirmSaveModal()">ยืนยัน</x-filament::button>
+        </div>
+    </x-filament::modal>
 </x-filament-panels::page>
 
 <script>
     const inputSearchPart = document.getElementById('input_search_part');
+    const partData = [];
 
     inputSearchPart.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
@@ -114,12 +135,19 @@
     function handleSave() {
         const table = document.getElementById('partsTable');
         const tableRows = table.querySelectorAll('tbody tr');
-        const partData = [];
+        // const partData = [];
+        let hasDataEmptyError = false;
         let hasPackingQtyError = false;
         let hasQtyError = false;
         let hasStockQtyError = false;
 
         tableRows.forEach((row, index) => {
+            const FCSKIDElement = row.querySelector(`#FCSKID_${index}`);
+            if (!FCSKIDElement) {
+                // console.warn(`Skipping row ${index} due to missing elements`);
+                hasDataEmptyError = true;
+                return;
+            }
             const FCSKID = row.querySelector(`#FCSKID_${index}`).textContent.trim();
             const FCCODE = row.querySelector(`#FCCODE_${index}`).textContent.trim();
             const FCSNAME = row.querySelector(`#FCSNAME_${index}`).textContent.trim();
@@ -176,9 +204,17 @@
         });
 
         // หากไม่มีข้อผิดพลาด แสดงข้อมูลที่ผ่านการตรวจสอบ
-        if (!hasPackingQtyError && !hasQtyError && !hasStockQtyError) {
-            console.log(partData); // Log data สำหรับตรวจสอบ
+        if (!hasDataEmptyError && !hasPackingQtyError && !hasQtyError && !hasStockQtyError) {
+            // console.log(partData);
+            document.getElementById('openConfirmSaveModal').click();
         } else {
+            if (hasDataEmptyError) {
+                @this.handleNotification(
+                    "เกิดข้อผิดพลาด",
+                    "ไม่มีข้อมูลที่สามารถบันทึกได้ กรุณาตรวจสอบข้อมูลที่กรอก",
+                    "danger"
+                );
+            }
             if (hasPackingQtyError) {
                 @this.handleNotification(
                     "เกิดข้อผิดพลาด",
@@ -201,5 +237,13 @@
                 );
             }
         }
+    }
+
+    function confirmSaveModal() {
+        // console.log(partData);
+        @this.$dispatch('close-modal', {
+            id: 'confirmSaveModal'
+        });
+        @this.handleConfirmSave(partData);
     }
 </script>
