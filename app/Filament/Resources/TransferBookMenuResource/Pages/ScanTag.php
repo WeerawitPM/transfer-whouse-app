@@ -7,6 +7,7 @@ use App\Models\JobDetail;
 use App\Models\JobHead;
 use App\Models\JobToTag;
 use Filament\Resources\Pages\Page;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Route;
 use Filament\Tables\Table;
 use Filament\Tables\Contracts\HasTable;
@@ -56,13 +57,24 @@ class ScanTag extends Page implements HasTable
     {
         $this->input_qr_code = $state;
 
-        $results = JobToTag::query()->where('qr_code', $state)->get();
+        $results = JobToTag::where('qr_code', $state)->get();
         if ($results->isNotEmpty()) {
-            $this->qr_code_array[] = $state;
+            $tag = $results->first();
+
+            if ($tag->status == 1) {
+                Notification::make()
+                    ->title('Tag นี้ถูก scan ไปแล้ว')
+                    ->warning()
+                    ->color('warning')
+                    ->send();
+            } else {
+                $this->qr_code_array[] = $state;
+            }
         } else {
             Notification::make()
                 ->title('ไม่พบ Tag')
                 ->warning()
+                ->color('warning')
                 ->send();
         }
 
@@ -110,11 +122,27 @@ class ScanTag extends Page implements HasTable
                 // Add filters if needed
             ])
             ->actions([
-                // Define row actions if needed
+                Action::make('Delete')
+                    ->label('Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->button()
+                    ->action(fn($record) => $this->handleDelete($record->qr_code))
             ])
             ->bulkActions([
                 // Define bulk actions if needed
             ]);
+    }
+
+    public function handleDelete($qr_code)
+    {
+        // Remove the selected QR code from qr_code_array
+        $this->qr_code_array = array_filter(
+            $this->qr_code_array,
+            fn($item) => $item !== $qr_code
+        );
+        // dd($qr_code);
+        $this->resetTable();
     }
 
     public function handleSave()
@@ -122,7 +150,7 @@ class ScanTag extends Page implements HasTable
         // ดึงข้อมูลจาก JobToTag และ JobDetail
         $jobToTag = $this->getTableRecords()->toArray();
         $job_id = $jobToTag[0]['job_id'];
-        $jobDetail = JobDetail::query()->where('job_id', $job_id)->get()->toArray();
+        $jobDetail = JobDetail::where('job_id', $job_id)->get()->toArray();
 
         // สร้าง array เพื่อเก็บจำนวนรวมของแต่ละ part_no ใน JobToTag
         $jobToTagQuantities = [];
@@ -159,11 +187,14 @@ class ScanTag extends Page implements HasTable
             Notification::make()
                 ->title('Scan tag ครบแล้ว')
                 ->success()
+                ->color('success')
                 ->send();
+            $this->resetTable();
         } else {
             Notification::make()
                 ->title('Scan tag ไม่ครบ')
                 ->warning()
+                ->color('warning')
                 ->send();
         }
 
@@ -174,7 +205,7 @@ class ScanTag extends Page implements HasTable
     public function handleUpdateJobHead($job_id)
     {
         JobHead::where('id', $job_id)->update(['status' => 1]);
-        dd($job_id, JobHead::where('id', $job_id)->first()->get());
+        // dd($job_id, JobHead::where('id', $job_id)->first()->get());
     }
 
     public function handleUpdateJobToTag($jobToTag)
