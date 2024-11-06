@@ -14,6 +14,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Tables\Columns\ImageColumn;
@@ -30,6 +31,7 @@ class WrPrint extends Page implements HasTable
     public $id; // Property to hold the ID
     public $transfer_book_id;
     public $job_no;
+    public $file_name;
     public $part_no;
 
     // Override the mount method to access the request
@@ -45,6 +47,7 @@ class WrPrint extends Page implements HasTable
 
             // เปลี่ยนเครื่องหมาย "-" เป็น "/" ใน job_no
             $this->job_no = str_replace('-', '/', $parts[1]);
+            $this->file_name = $parts[1];
 
             $this->part_no = $parts[2];
         }
@@ -64,11 +67,13 @@ class WrPrint extends Page implements HasTable
                 ButtonAction::make('print_document')
                     ->label('Print Document')
                     ->color('primary')
-                    ->icon('heroicon-o-printer'),
+                    ->icon('heroicon-o-printer')
+                    ->action('print_document'),
                 ButtonAction::make('print_tag')
                     ->label('Print Tag')
                     ->color('primary')
-                    ->icon('heroicon-o-printer'),
+                    ->icon('heroicon-o-printer')
+                    ->action('print_tags'),
             ];
         } else {
             return [
@@ -273,6 +278,102 @@ class WrPrint extends Page implements HasTable
                 'created_date' => $created_date,
                 'user_id' => $user_id,
             ]);
+        }
+    }
+
+    public function print_document()
+    {
+        $job = JobHead::where('job_no', $this->job_no)->first();
+        $jobId = $job->id;
+        $file_name = "Document_$this->file_name.pdf";
+        // dd($file_name);
+
+        // ตั้งค่า Jasper Server
+        $jasperServer = env('JASPER_SERVER', 'http://localhost:8080');
+        $jasperUser = env('JASPER_USER', 'jasperadmin');
+        $jasperPassword = env('JASPER_PASSWORD', 'jasperadmin');
+
+        // URL สำหรับการเข้าถึงรายงาน
+        $urlReport = "{$jasperServer}/jasperserver/rest_v2/reports/vcst_report/document_vcst.pdf?ParmID={$jobId}";
+
+        try {
+            $response = Http::withBasicAuth($jasperUser, $jasperPassword)
+                ->withHeaders(['Accept' => 'application/pdf'])
+                ->get($urlReport);
+
+            if ($response->successful()) {
+                Notification::make()
+                    ->title('ปริ้น Document สำเร็จ')
+                    ->success()
+                    ->color('success')
+                    ->send();
+                return response()->streamDownload(function () use ($response) {
+                    echo $response->body();
+                }, $file_name, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename=' . $file_name,
+                ]);
+            } else {
+                Notification::make()
+                    ->title('เกิดข้อผิดพลาดในการสร้างรายงาน')
+                    ->danger()
+                    ->send();
+                return redirect()->back();
+            }
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('เกิดข้อผิดพลาดในการเชื่อมต่อกับ Jasper Server')
+                ->danger()
+                ->send();
+            return redirect()->back();
+        }
+    }
+
+    public function print_tags()
+    {
+        $job = JobHead::where('job_no', $this->job_no)->first();
+        $jobId = $job->id;
+        $file_name = "Tag_$this->file_name.pdf";
+        // dd($file_name);
+
+        // ตั้งค่า Jasper Server
+        $jasperServer = env('JASPER_SERVER', 'http://localhost:8080');
+        $jasperUser = env('JASPER_USER', 'jasperadmin');
+        $jasperPassword = env('JASPER_PASSWORD', 'jasperadmin');
+
+        // URL สำหรับการเข้าถึงรายงาน
+        $urlReport = "{$jasperServer}/jasperserver/rest_v2/reports/vcst_tag/print_tag_vcst_new.pdf?ParmID={$jobId}";
+
+        try {
+            $response = Http::withBasicAuth($jasperUser, $jasperPassword)
+                ->withHeaders(['Accept' => 'application/pdf'])
+                ->get($urlReport);
+
+            if ($response->successful()) {
+                Notification::make()
+                    ->title('ปริ้น Tag สำเร็จ')
+                    ->success()
+                    ->color('success')
+                    ->send();
+                return response()->streamDownload(function () use ($response) {
+                    echo $response->body();
+                }, $file_name, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename=' . $file_name,
+                ]);
+            } else {
+                Notification::make()
+                    ->title('เกิดข้อผิดพลาดในการสร้างรายงาน')
+                    ->danger()
+                    ->send();
+                return redirect()->back();
+            }
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('เกิดข้อผิดพลาดในการเชื่อมต่อกับ Jasper Server')
+                ->danger()
+                ->send();
+            return redirect()->back();
         }
     }
 }
