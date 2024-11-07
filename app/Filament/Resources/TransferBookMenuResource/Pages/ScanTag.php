@@ -261,38 +261,39 @@ class ScanTag extends Page implements HasTable
         $fcseq_counter = 001;
 
         foreach ($jobDetail as $item) {
-            // do {
-            //     $FCSKID = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 7);
+            do {
+                $FCSKID_GLREF = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 7);
 
-            //     // ตรวจสอบว่ามี $FCSKID อยู่ใน table GLREF หรือไม่
-            //     $exists = DB::connection('itc_wms')->table('GLREF')
-            //         ->where('FCSKID', $FCSKID)
-            //         ->exists();
-            // } while ($exists); // ถ้ามี $FCSKID ซ้ำ จะสุ่มใหม่จนกว่าจะไม่ซ้ำ
+                // ตรวจสอบว่ามี $FCSKID อยู่ใน table GLREF หรือไม่
+                $exists = DB::connection('itc_wms')->table('GLREF')
+                    ->where('FCSKID', $FCSKID_GLREF)
+                    ->exists();
+            } while ($exists); // ถ้ามี $FCSKID_GLREF ซ้ำ จะสุ่มใหม่จนกว่าจะไม่ซ้ำ
 
-            // $FNAMT = $item['qty'];
+            $FNAMT = $item['qty'];
 
-            // $INSERT_TBL_GLREF = DB::connection('itc_wms')->statement(
-            //     'EXEC INSERT_TBL_GLREF ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
-            //     [
-            //         $FCSKID,
-            //         $FCRFTYPE,
-            //         $FCREFTYPE,
-            //         $FCDEPT,
-            //         $FCSECT,
-            //         $FDDATE,
-            //         $FCBOOK,
-            //         $FCCODE,
-            //         $FCREFNO,
-            //         $FNAMT,
-            //         $FCFRWHOUSE,
-            //         $FCTOWHOUSE,
-            //         $FCCREATEBY,
-            //         $FMMEMDATA
-            //     ]
-            // );
+            $INSERT_TBL_GLREF = DB::connection('itc_wms')->statement(
+                'EXEC INSERT_TBL_GLREF ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+                [
+                    $FCSKID_GLREF,
+                    $FCRFTYPE,
+                    $FCREFTYPE,
+                    $FCDEPT,
+                    $FCSECT,
+                    $FDDATE,
+                    $FCBOOK,
+                    $FCCODE,
+                    $FCREFNO,
+                    $FNAMT,
+                    $FCFRWHOUSE,
+                    $FCTOWHOUSE,
+                    $FCCREATEBY,
+                    $FMMEMDATA
+                ]
+            );
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
+            //REFPROD
             for ($i = 0; $i < 2; $i++) {
                 $product = DB::connection('formula')
                     ->table('PROD')
@@ -300,34 +301,55 @@ class ScanTag extends Page implements HasTable
                     ->where('FCCODE', $item['part_no'])->get()->first();
 
                 do {
-                    $FCSKID = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 7);
+                    $FCSKID_REFPROD = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 7);
 
                     // ตรวจสอบว่ามี $FCSKID อยู่ใน table REFPROD หรือไม่
                     $exists = DB::connection('itc_wms')->table('REFPROD')
-                        ->where('FCSKID', $FCSKID)
+                        ->where('FCSKID', $FCSKID_REFPROD)
                         ->exists();
                 } while ($exists); // ถ้ามี $FCSKID ซ้ำ จะสุ่มใหม่จนกว่าจะไม่ซ้ำ
 
-                // $INSERT_TBL_REFPROD = DB::connection('itc_wms')->statement(
-                //     'EXEC INSERT_TBL_REFPROD ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
-                //     [
-                //         $FCSKID,
-                //         $FCRFTYPE,
-                //         $FCREFTYPE,
-                //         $FCDEPT,
-                //         $FCSECT,
-                //         $FDDATE,
-                //         $FCBOOK,
-                //         $FCCODE,
-                //         $FCREFNO,
-                //         $FNAMT,
-                //         $FCFRWHOUSE,
-                //         $FCTOWHOUSE,
-                //         $FCCREATEBY,
-                //         $FMMEMDATA
-                //     ]
-                // );
+                if ($i == 0) {
+                    $FCIOTYPE = "I";
+                    $FCWHOUSE = $FCTOWHOUSE;
+                } else {
+                    $FCIOTYPE = "O";
+                    $FCWHOUSE = $FCFRWHOUSE;
+                }
+
+                $FCPROD = $product->FCSKID;
+                $FCREFPDTYP = "P";
+                $FCPRODTYPE = $product->FCTYPE;
+                $FNQTY = $FNAMT;
+                $FNPRICE = $FNQTY * $product->FNSTDCOST;
+                $FCUM = $product->FCUM;
+                $FCSEQ = $fcseq_counter;
+
+                $INSERT_TBL_REFPROD = DB::connection('itc_wms')->statement(
+                    'EXEC INSERT_TBL_REFPROD ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+                    [
+                        $FCSKID_REFPROD, //FCSKID
+                        $FCRFTYPE,
+                        $FCREFTYPE,
+                        $FCDEPT,
+                        $FCSECT,
+                        $FDDATE,
+                        $FCPROD, //FCSKID ของ PROD
+                        $FCREFPDTYP,
+                        $FCPRODTYPE,
+                        $FNQTY,
+                        $FNPRICE,
+                        $FCUM,
+                        $FCSEQ,
+                        $FCIOTYPE,
+                        $FCSKID_GLREF, //FCGLREF
+                        $FCWHOUSE,
+                        $FCCREATEBY,
+                        $FMMEMDATA
+                    ]
+                );
             }
+            $fcseq_counter++;
         }
     }
 
