@@ -62,6 +62,7 @@ class JobToTagResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('job_head.job_no', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

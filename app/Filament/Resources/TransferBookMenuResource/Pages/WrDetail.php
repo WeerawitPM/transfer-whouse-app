@@ -68,6 +68,7 @@ class WrDetail extends Page implements HasTable
     {
         // dd($this->id);
         return $table
+            ->defaultSort('JOB_NO', 'DESC')
             ->query(fn() => $this->getTableData())
             ->columns([
                 TextColumn::make('JOB_NO')

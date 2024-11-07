@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
+use App\Models\FormulaFormulas;
 use App\Models\JobDetail;
 use App\Models\JobHead;
 use App\Models\JobToTag;
@@ -57,10 +58,13 @@ class ScanTag extends Page implements HasTable
     {
         $this->input_qr_code = $state;
 
-        $results = JobToTag::where('qr_code', $state)->get();
-        if ($results->isNotEmpty()) {
-            $tag = $results->first();
+        if ($this->input_qr_code == '') {
+            return;
+        }
 
+        $tag = JobToTag::where('qr_code', $state)->get()->first();
+        // dd($tag->part_no);
+        if ($tag) {
             if ($tag->status == 1) {
                 Notification::make()
                     ->title('Tag นี้ถูก scan ไปแล้ว')
@@ -68,7 +72,20 @@ class ScanTag extends Page implements HasTable
                     ->color('warning')
                     ->send();
             } else {
-                $this->qr_code_array[] = $state;
+                if (!empty($this->qr_code_array)) {
+                    $last_tag = JobToTag::where('qr_code', end($this->qr_code_array))->get()->first();
+                    if ($tag->job_id == $last_tag->job_id) {
+                        $this->qr_code_array[] = $state;
+                    } else {
+                        Notification::make()
+                            ->title('ห้าม scan tag คนละ job กัน')
+                            ->warning()
+                            ->color('warning')
+                            ->send();
+                    }
+                } else {
+                    $this->qr_code_array[] = $state;
+                }
             }
         } else {
             Notification::make()
@@ -83,12 +100,13 @@ class ScanTag extends Page implements HasTable
 
     public function table(Table $table): Table
     {
+        $query = JobToTag::query()->whereIn('qr_code', $this->qr_code_array ?? []);
+
         return $table
             ->paginated(false)
+            ->defaultSort('qr_code', 'desc')
             ->query(
-                JobToTag::query()
-                    // ->where('qr_code', $this->input_qr_code)
-                    ->whereIn('qr_code', $this->qr_code_array ?? [])
+                $query,
             )
             ->columns([
                 ImageColumn::make('image')
@@ -181,9 +199,10 @@ class ScanTag extends Page implements HasTable
 
         // แสดงผลลัพธ์การตรวจสอบ
         if ($isComplete) {
-            $this->handleUpdateJobHead($job_id);
-            $this->handleUpdateJobToTag($jobToTag);
-            $this->handleUpdateJobDetail($jobDetail);
+            $this->handleSaveMomProduct($jobDetail);
+            // $this->handleUpdateJobHead($job_id);
+            // $this->handleUpdateJobToTag($jobToTag);
+            // $this->handleUpdateJobDetail($jobDetail);
             Notification::make()
                 ->title('Scan tag ครบแล้ว')
                 ->success()
@@ -200,6 +219,23 @@ class ScanTag extends Page implements HasTable
 
         // Debug ข้อมูล
         // dd($jobToTag, $jobDetail, $jobToTagQuantities, $isComplete);
+    }
+
+    public function handleSaveMomProduct($jobDetail)
+    {
+        // วนลูปเพื่อดึงค่า part_no แต่ละตัวใน jobDetail
+        $childProducts = [];
+        foreach ($jobDetail as $detail) {
+            $partNo = $detail['part_no'];
+
+            // เรียกใช้ getChildProduct สำหรับแต่ละ part_no
+            $childProduct = FormulaFormulas::getChildProduct($partNo)->get()->toArray();
+
+            // เก็บผลลัพธ์ของแต่ละ part_no ไว้ใน array
+            $childProducts[$partNo] = $childProduct;
+        }
+
+        dd($childProducts);
     }
 
     public function handleUpdateJobHead($job_id)
