@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamps();
             $table->string('FCSKID');
             $table->string('FCCODE');
-            $table->string('FCRETYPE');
+            $table->string('FCRFTYPE');
             $table->string('FCNAME');
             $table->string('FCNAME2');
             $table->string('FCNGLNAME');

@@ -28,7 +28,7 @@ class RefTypeResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('FCCODE')
                     ->required(),
-                Forms\Components\TextInput::make('FCRETYPE')
+                Forms\Components\TextInput::make('FCRFTYPE')
                     ->required(),
                 Forms\Components\TextInput::make('FCNAME')
                     ->required(),
@@ -57,7 +57,7 @@ class RefTypeResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCCODE')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('FCRETYPE')
+                Tables\Columns\TextColumn::make('FCRFTYPE')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCNAME')
                     ->searchable(),

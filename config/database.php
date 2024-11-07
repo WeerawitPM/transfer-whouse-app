@@ -157,6 +157,21 @@ return [
             'trust_server_certificate' => env('KANBAN_TRUST_SERVER_CERTIFICATE', 'yes'),
         ],
 
+        'itc_wms' => [
+            'driver' => 'sqlsrv',
+            'url' => env('ITC_WMS_URL'),
+            'host' => env('ITC_WMS_HOST', 'localhost'),
+            'port' => env('ITC_WMS_PORT', '1433'),
+            'database' => env('ITC_WMS_DBNAME', 'laravel'),
+            'username' => env('ITC_WMS_USERNAME', 'root'),
+            'password' => env('ITC_WMS_PASSWORD', ''),
+            'charset' => env('ITC_WMS_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'encrypt' => env('ITC_WMS_ENCRYPT', 'yes'),
+            'trust_server_certificate' => env('ITC_WMS_TRUST_SERVER_CERTIFICATE', 'yes'),
+        ],
+
 
     ],
 

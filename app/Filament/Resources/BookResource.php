@@ -31,6 +31,8 @@ class BookResource extends Resource
                 Forms\Components\TextInput::make('FCNAME'),
                 Forms\Components\TextInput::make('FCNAME2'),
                 Forms\Components\TextInput::make('FCACCBOOK'),
+                Forms\Components\TextInput::make('FCWHOUSE'),
+                Forms\Components\TextInput::make('FCPREFIX'),
                 Select::make('from_whs_id')
                     ->searchable()
                     ->options(Whouse::all()->mapWithKeys(function (Whouse $whouse) {
@@ -71,6 +73,10 @@ class BookResource extends Resource
                 Tables\Columns\TextColumn::make('FCNAME2')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCACCBOOK')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('FCWHOUSE')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('FCPREFIX')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('from_whs')
                     ->formatStateUsing(fn(Book $record) => "{$record->from_whs->FCCODE} {$record->from_whs->FCNAME}")

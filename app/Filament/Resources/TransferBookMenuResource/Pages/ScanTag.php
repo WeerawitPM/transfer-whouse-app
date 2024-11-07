@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
+use App\Models\Book;
 use App\Models\FormulaFormulas;
 use App\Models\JobDetail;
 use App\Models\JobHead;
 use App\Models\JobToTag;
+use App\Models\RefType;
+use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +21,9 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
+use Auth;
+
 
 class ScanTag extends Page implements HasTable
 {
@@ -71,6 +77,7 @@ class ScanTag extends Page implements HasTable
                     ->warning()
                     ->color('warning')
                     ->send();
+                return;
             } else {
                 if (!empty($this->qr_code_array)) {
                     $last_tag = JobToTag::where('qr_code', end($this->qr_code_array))->get()->first();
@@ -82,6 +89,7 @@ class ScanTag extends Page implements HasTable
                             ->warning()
                             ->color('warning')
                             ->send();
+                        return;
                     }
                 } else {
                     $this->qr_code_array[] = $state;
@@ -93,6 +101,7 @@ class ScanTag extends Page implements HasTable
                 ->warning()
                 ->color('warning')
                 ->send();
+            return;
         }
 
         $this->resetTable();
@@ -199,7 +208,9 @@ class ScanTag extends Page implements HasTable
 
         // แสดงผลลัพธ์การตรวจสอบ
         if ($isComplete) {
-            $this->handleSaveMomProduct($jobDetail);
+            $user = Auth::user();
+            $book = TransferBook::where('id', $this->id)->get()->first()->book;
+            $this->handleSaveMomProduct($jobDetail, $book, $user);
             // $this->handleUpdateJobHead($job_id);
             // $this->handleUpdateJobToTag($jobToTag);
             // $this->handleUpdateJobDetail($jobDetail);
@@ -221,7 +232,106 @@ class ScanTag extends Page implements HasTable
         // dd($jobToTag, $jobDetail, $jobToTagQuantities, $isComplete);
     }
 
-    public function handleSaveMomProduct($jobDetail)
+    public function handleSaveMomProduct($jobDetail, $book, $user)
+    {
+        $book_fcskid = $book->FCSKID;
+        $current_year = now()->year;
+        $current_month = now()->format("m");
+        $current_date = now()->toDateString();
+
+        $FCCODE_GLREF = DB::connection('itc_wms')->select(
+            'EXEC GET_FCCODE_GLREF ?, ?, ?',
+            [$book_fcskid, $current_year, $current_month]
+        );
+        // dd($FCCODE[0]->FCCODE);
+
+        $FCRFTYPE = RefType::where("FCSKID", $book->FCREFTYPE)->pluck("FCRFTYPE")->first();
+        $FCREFTYPE = $book->FCREFTYPE;
+        $FCDEPT = $user->dept->FCSKID;
+        $FCSECT = $user->sect->FCSKID;
+        $FDDATE = $current_date;
+        $FCBOOK = $book_fcskid;
+        $FCCODE = $FCCODE_GLREF[0]->FCCODE;
+        $FCREFNO = $book->FCPREFIX . $FCCODE_GLREF[0]->FCCODE;
+        $FCFRWHOUSE = $book->from_whs->FCSKID;
+        $FCTOWHOUSE = $book->to_whs->FCSKID;
+        $FCCREATEBY = $user->emplr->FCSKID;
+        $FMMEMDATA = "Scan";
+
+        $fcseq_counter = 001;
+
+        foreach ($jobDetail as $item) {
+            // do {
+            //     $FCSKID = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 7);
+
+            //     // ตรวจสอบว่ามี $FCSKID อยู่ใน table GLREF หรือไม่
+            //     $exists = DB::connection('itc_wms')->table('GLREF')
+            //         ->where('FCSKID', $FCSKID)
+            //         ->exists();
+            // } while ($exists); // ถ้ามี $FCSKID ซ้ำ จะสุ่มใหม่จนกว่าจะไม่ซ้ำ
+
+            // $FNAMT = $item['qty'];
+
+            // $INSERT_TBL_GLREF = DB::connection('itc_wms')->statement(
+            //     'EXEC INSERT_TBL_GLREF ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+            //     [
+            //         $FCSKID,
+            //         $FCRFTYPE,
+            //         $FCREFTYPE,
+            //         $FCDEPT,
+            //         $FCSECT,
+            //         $FDDATE,
+            //         $FCBOOK,
+            //         $FCCODE,
+            //         $FCREFNO,
+            //         $FNAMT,
+            //         $FCFRWHOUSE,
+            //         $FCTOWHOUSE,
+            //         $FCCREATEBY,
+            //         $FMMEMDATA
+            //     ]
+            // );
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            for ($i = 0; $i < 2; $i++) {
+                $product = DB::connection('formula')
+                    ->table('PROD')
+                    ->select('FCSKID', 'FCTYPE', 'FNSTDCOST', 'FCUM')
+                    ->where('FCCODE', $item['part_no'])->get()->first();
+
+                do {
+                    $FCSKID = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 7);
+
+                    // ตรวจสอบว่ามี $FCSKID อยู่ใน table REFPROD หรือไม่
+                    $exists = DB::connection('itc_wms')->table('REFPROD')
+                        ->where('FCSKID', $FCSKID)
+                        ->exists();
+                } while ($exists); // ถ้ามี $FCSKID ซ้ำ จะสุ่มใหม่จนกว่าจะไม่ซ้ำ
+
+                // $INSERT_TBL_REFPROD = DB::connection('itc_wms')->statement(
+                //     'EXEC INSERT_TBL_REFPROD ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+                //     [
+                //         $FCSKID,
+                //         $FCRFTYPE,
+                //         $FCREFTYPE,
+                //         $FCDEPT,
+                //         $FCSECT,
+                //         $FDDATE,
+                //         $FCBOOK,
+                //         $FCCODE,
+                //         $FCREFNO,
+                //         $FNAMT,
+                //         $FCFRWHOUSE,
+                //         $FCTOWHOUSE,
+                //         $FCCREATEBY,
+                //         $FMMEMDATA
+                //     ]
+                // );
+            }
+        }
+    }
+
+    public function hadleSaveChildProduct($jobDetail)
     {
         // วนลูปเพื่อดึงค่า part_no แต่ละตัวใน jobDetail
         $childProducts = [];

@@ -36,6 +36,10 @@ return new class extends Migration {
                 ->nullable()
                 ->constrained('whouses')
                 ->nullOnDelete();
+            $table->string('FCWHOUSE')
+                ->nullable();
+            $table->string('FCPREFIX')
+                ->nullable();
         });
     }
 

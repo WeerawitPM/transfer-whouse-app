@@ -14,16 +14,6 @@ class BookSeeder extends Seeder
      */
     public function run(): void
     {
-        // 'FCSKID',
-        // 'FCREFTYPE',
-        // 'FCCORP',
-        // 'FCBRANCH',
-        // 'FCCODE',
-        // 'FCNAME',
-        // 'FCNAME2',
-        // 'FCACCBOOK',
-        // 'FROM_WHS',
-        // 'TO_WHS',
         $data = FormulaBook::all();
         foreach ($data as $item) {
             $FCSKID = trim($item->FCSKID);
@@ -34,6 +24,8 @@ class BookSeeder extends Seeder
             $FCNAME = trim($item->FCNAME);
             $FCNAME2 = trim($item->FCNAME2);
             $FCACCBOOK = trim($item->FCACCBOOK);
+            $FCWHOUSE = trim($item->FCWHOUSE);
+            $FCPREFIX = trim($item->FCPREFIX);
 
             Book::updateOrCreate(
                 ['FCSKID' => $FCSKID], // เงื่อนไขในการค้นหาข้อมูล
@@ -45,6 +37,8 @@ class BookSeeder extends Seeder
                     'FCNAME' => $FCNAME,
                     'FCNAME2' => $FCNAME2,
                     'FCACCBOOK' => $FCACCBOOK,
+                    'FCWHOUSE' => $FCWHOUSE,
+                    'FCPREFIX' => $FCPREFIX
                 ]
             );
         }

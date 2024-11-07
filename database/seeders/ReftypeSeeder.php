@@ -18,7 +18,7 @@ class ReftypeSeeder extends Seeder
         foreach ($data as $item) {
             $FCSKID = trim($item->FCSKID);
             $FCCODE = trim($item->FCCODE);
-            $FCRETYPE = trim($item->FCRETYPE);
+            $FCRFTYPE = trim($item->FCRFTYPE);
             $FCNAME = trim($item->FCNAME);
             $FCNAME2 = trim($item->FCNAME2);
             $FCNGLNAME = trim($item->FCNGLNAME);
@@ -28,7 +28,7 @@ class ReftypeSeeder extends Seeder
                 ['FCSKID' => $FCSKID], // เงื่อนไขในการค้นหาข้อมูล
                 [
                     'FCCODE' => $FCCODE,
-                    'FCRETYPE' => $FCRETYPE,
+                    'FCRFTYPE' => $FCRFTYPE,
                     'FCNAME' => $FCNAME,
                     'FCNAME2' => $FCNAME2,
                     'FCNGLNAME' => $FCNGLNAME,
