@@ -36,6 +36,7 @@ class FormulaFormulas extends Model
             LTRIM(RTRIM(P.FCSKID)) AS KEY_SON, 
             S.FNQTY AS NQTY,
             LTRIM(RTRIM(P.FCUM)) AS UM_SON,
+            LTRIM(RTRIM(P.FCTYPE)) AS FCTYPE,
             P.FNSTDCOST AS FNSTDCOST
         ')
             ->join('FORMULA.dbo.vmCorp AS C', function ($join) {
