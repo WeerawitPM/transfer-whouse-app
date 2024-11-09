@@ -1,25 +1,33 @@
 <?php
 
+namespace App\Filament\Resources\TransferBookMenuResource\Functions;
+
 use App\Models\JobDetail;
 use App\Models\JobHead;
 use App\Models\JobToTag;
 
-function handleUpdateJobHead($job_id)
+class handleJob
 {
-    JobHead::where('id', $job_id)->update(['status' => 1]);
-    // dd($job_id, JobHead::where('id', $job_id)->first()->get());
-}
-
-function handleUpdateJobToTag($jobToTag)
-{
-    foreach ($jobToTag as $tag) {
-        JobToTag::where('id', $tag['id'])->update(['status' => 1]);
+    public static function handleUpdateJobHead($job_id)
+    {
+        JobHead::where('id', $job_id)->update(['status' => 1]);
+        // dd($job_id, JobHead::where('id', $job_id)->first()->get());
+        return;
     }
-}
 
-function handleUpdateJobDetail($jobDetail)
-{
-    foreach ($jobDetail as $tag) {
-        JobDetail::where('id', $tag['id'])->update(['status' => 1]);
+    public static function handleUpdateJobToTag($jobToTag)
+    {
+        foreach ($jobToTag as $tag) {
+            JobToTag::where('id', $tag['id'])->update(['status' => 1]);
+        }
+        return;
+    }
+
+    public static function handleUpdateJobDetail($jobDetail)
+    {
+        foreach ($jobDetail as $tag) {
+            JobDetail::where('id', $tag['id'])->update(['status' => 1]);
+        }
+        return;
     }
 }

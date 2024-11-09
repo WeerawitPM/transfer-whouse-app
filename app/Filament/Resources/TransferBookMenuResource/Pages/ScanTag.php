@@ -23,6 +23,9 @@ use Filament\Pages\Actions\ButtonAction;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Auth;
+use App\Filament\Resources\TransferBookMenuResource\Functions\handleJob;
+use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveProduct;
+use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveWrProduct;
 
 
 class ScanTag extends Page implements HasTable
@@ -79,21 +82,9 @@ class ScanTag extends Page implements HasTable
                     ->send();
                 return;
             } else {
-                if (!empty($this->qr_code_array)) {
-                    $last_tag = JobToTag::where('qr_code', end($this->qr_code_array))->get()->first();
-                    if ($tag->job_id == $last_tag->job_id) {
-                        $this->qr_code_array[] = $state;
-                    } else {
-                        Notification::make()
-                            ->title('ห้าม scan tag คนละ job กัน')
-                            ->warning()
-                            ->color('warning')
-                            ->send();
-                        return;
-                    }
-                } else {
-                    $this->qr_code_array[] = $state;
-                }
+                $this->qr_code_array[] = $state;
+                $this->resetTable();
+                return;
             }
         } else {
             Notification::make()
@@ -103,8 +94,6 @@ class ScanTag extends Page implements HasTable
                 ->send();
             return;
         }
-
-        $this->resetTable();
     }
 
     public function table(Table $table): Table
@@ -174,61 +163,42 @@ class ScanTag extends Page implements HasTable
 
     public function handleSave()
     {
-        // ดึงข้อมูลจาก JobToTag และ JobDetail
+        // ดึงข้อมูลจาก JobToTag
         $jobToTag = $this->getTableRecords()->toArray();
-        $job_id = $jobToTag[0]['job_id'];
-        $jobDetail = JobDetail::where('job_id', $job_id)->get()->toArray();
 
         // สร้าง array เพื่อเก็บจำนวนรวมของแต่ละ part_no ใน JobToTag
-        $jobToTagQuantities = [];
+        $jobDetail = [];
         foreach ($jobToTag as $tag) {
             $partNo = $tag['part_no'];
-            $qty = $tag['qty'];
 
-            // รวม qty สำหรับ part_no เดียวกัน
-            if (isset($jobToTagQuantities[$partNo])) {
-                $jobToTagQuantities[$partNo] += $qty;
+            // ถ้า part_no นี้มีอยู่ใน jobDetail แล้ว ให้รวม qty เข้าด้วยกัน
+            if (isset($jobDetail[$partNo])) {
+                $jobDetail[$partNo]['qty'] += $tag['qty'];
             } else {
-                $jobToTagQuantities[$partNo] = $qty;
+                // ถ้ายังไม่มี part_no นี้ใน jobDetail ให้เพิ่มเข้าไป
+                $jobDetail[$partNo] = $tag;
             }
         }
 
-        // ตรวจสอบว่า qty ใน JobDetails ตรงกับ qty รวมใน JobToTag หรือไม่
-        $isComplete = true;
-        foreach ($jobDetail as $detail) {
-            $partNo = $detail['part_no'];
-            $requiredQty = $detail['qty'];
+        // แปลง jobDetail กลับเป็น array เพื่อให้ง่ายต่อการใช้งาน
+        $jobDetail = array_values($jobDetail);
 
-            // ตรวจสอบว่ามีจำนวนรวมที่ตรงกับ JobDetails หรือไม่
-            if (!isset($jobToTagQuantities[$partNo]) || $jobToTagQuantities[$partNo] != $requiredQty) {
-                $isComplete = false;
-                break;
-            }
-        }
+        // dd($jobDetail);
 
-        // แสดงผลลัพธ์การตรวจสอบ
-        if ($isComplete) {
-            $user = Auth::user();
-            $book = TransferBook::where('id', $this->id)->get()->first()->book;
-            handleSaveProduct($jobDetail, $book, $user);
-            hadleSaveWrProduct($jobDetail, $user);
-            handleUpdateJobHead($job_id);
-            handleUpdateJobToTag($jobToTag);
-            handleUpdateJobDetail($jobDetail);
-            Notification::make()
-                ->title('Scan tag ครบแล้ว')
-                ->success()
-                ->color('success')
-                ->send();
-            $this->qr_code_array = [];
-            $this->resetTable();
-        } else {
-            Notification::make()
-                ->title('Scan tag ไม่ครบ')
-                ->warning()
-                ->color('warning')
-                ->send();
-        }
+        $user = Auth::user();
+        $book = TransferBook::where('id', $this->id)->get()->first()->book;
+        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user);
+        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user);
+        // handleJob::handleUpdateJobHead($job_id);
+        // handleJob::handleUpdateJobToTag($jobToTag);
+        // handleJob::handleUpdateJobDetail($jobDetail);
+        Notification::make()
+            ->title('Scan tag ครบแล้ว')
+            ->success()
+            ->color('success')
+            ->send();
+        $this->qr_code_array = [];
+        $this->resetTable();
 
         // Debug ข้อมูล
         // dd($jobToTag, $jobDetail, $jobToTagQuantities, $isComplete);
