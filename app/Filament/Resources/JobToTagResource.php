@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\ImageColumn;
@@ -111,7 +112,12 @@ class JobToTagResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                // Filter Status
+                SelectFilter::make('status')
+                    ->options([
+                        '0' => 'Pending',
+                        '1' => 'Completed',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -12,6 +12,7 @@ use App\Models\RefType;
 use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Facades\Route;
 use Filament\Tables\Table;
 use Filament\Tables\Contracts\HasTable;
@@ -99,6 +100,7 @@ class ScanTag extends Page implements HasTable
     public function table(Table $table): Table
     {
         $query = JobToTag::query()->whereIn('qr_code', $this->qr_code_array ?? []);
+        $partNoOptions = $query->pluck('part_no', 'part_no')->toArray();
 
         return $table
             ->paginated(false)
@@ -135,7 +137,9 @@ class ScanTag extends Page implements HasTable
                     ->searchable(),
             ])
             ->filters([
-                // Add filters if needed
+                SelectFilter::make('part_no')
+                    ->label('Part No')
+                    ->options($partNoOptions),
             ])
             ->actions([
                 Action::make('Delete')

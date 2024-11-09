@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\TransferBookMenuResource\Functions;
 
+use App\Models\Fccode_Glref;
+use App\Models\Glref;
+use App\Models\RefProd;
 use App\Models\RefType;
 use Illuminate\Support\Facades\DB;
 
@@ -9,17 +12,18 @@ class handleSaveProduct
 {
     public static function handleSaveProduct($jobDetail, $book, $user)
     {
-        // dd("test");
         $book_fcskid = $book->FCSKID;
         $current_year = now()->year;
         $current_month = now()->format("m");
         $current_date = now()->toDateString();
 
-        $FCCODE_GLREF = DB::connection('itc_wms')->select(
-            'EXEC GET_FCCODE_GLREF ?, ?, ?',
-            [$book_fcskid, $current_year, $current_month]
-        );
-        // dd($FCCODE_GLREF[0]->FCCODE);
+        // $FCCODE_GLREF = DB::connection('itc_wms')->selectOne(
+        //     'EXEC dbo.GET_FCCODE_GLREF ?, ?, ?',
+        //     [$book_fcskid, $current_year, $current_month]
+        // );
+        // dd($FCCODE_GLREF->FCCODE);
+        $FCCODE_GLREF = Fccode_Glref::get_fccode_glref($book_fcskid, $current_year, $current_month);
+        // dd($FCCODE_GLREF);
 
         $FCRFTYPE = RefType::where("FCSKID", $book->FCREFTYPE)->pluck("FCRFTYPE")->first();
         // dd($FCRFTYPE);
@@ -28,8 +32,8 @@ class handleSaveProduct
         $FCSECT = $user->sect->FCSKID;
         $FDDATE = $current_date;
         $FCBOOK = $book_fcskid;
-        $FCCODE = $FCCODE_GLREF[0]->FCCODE;
-        $FCREFNO = $book->FCPREFIX . $FCCODE_GLREF[0]->FCCODE;
+        $FCCODE = $FCCODE_GLREF;
+        $FCREFNO = $book->FCPREFIX . $FCCODE_GLREF;
         $FCFRWHOUSE = $book->from_whs->FCSKID;
         $FCTOWHOUSE = $book->to_whs->FCSKID;
         $FCCREATEBY = $user->emplr->FCSKID;
@@ -50,25 +54,24 @@ class handleSaveProduct
 
             $FNAMT = $item['qty'];
 
-            $INSERT_TBL_GLREF = DB::connection('itc_wms')->statement(
-                'EXEC INSERT_TBL_GLREF ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
-                [
-                    $FCSKID_GLREF,
-                    $FCRFTYPE,
-                    $FCREFTYPE,
-                    $FCDEPT,
-                    $FCSECT,
-                    $FDDATE,
-                    $FCBOOK,
-                    $FCCODE,
-                    $FCREFNO,
-                    $FNAMT,
-                    $FCFRWHOUSE,
-                    $FCTOWHOUSE,
-                    $FCCREATEBY,
-                    $FMMEMDATA
-                ]
-            );
+            $data = [
+                'FCSKID' => $FCSKID_GLREF,
+                'FCRFTYPE' => $FCRFTYPE,
+                'FCREFTYPE' => $FCREFTYPE,
+                'FCDEPT' => $FCDEPT,
+                'FCSECT' => $FCSECT,
+                'FDDATE' => $FDDATE,
+                'FCBOOK' => $FCBOOK,
+                'FCCODE' => $FCCODE,
+                'FCREFNO' => $FCREFNO,
+                'FNAMT' => $FNAMT,
+                'FCFRWHOUSE' => $FCFRWHOUSE,
+                'FCTOWHOUSE' => $FCTOWHOUSE,
+                'FCCREATEBY' => $FCCREATEBY,
+                'FMMEMDATA' => $FMMEMDATA
+            ];
+            Glref::insertGlrefData($data);
+            // dd($data);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             //REFPROD
@@ -106,35 +109,34 @@ class handleSaveProduct
                 $FCFORMULAS = "";
                 $FCROOTSEQ = "";
 
-                $INSERT_TBL_REFPROD = DB::connection('itc_wms')->statement(
-                    'EXEC INSERT_TBL_REFPROD ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
-                    [
-                        $FCSKID_REFPROD, //FCSKID
-                        $FCRFTYPE,
-                        $FCREFTYPE,
-                        $FCDEPT,
-                        $FCSECT,
-                        $FDDATE,
-                        $FCPROD, //FCSKID ของ PROD
-                        $FCREFPDTYP,
-                        $FCPRODTYPE,
-                        $FNQTY,
-                        $FNPRICE,
-                        $FCUM,
-                        $FCSEQ,
-                        $FCIOTYPE,
-                        $FCSKID_GLREF, //FCGLREF
-                        $FCWHOUSE,
-                        $FCCREATEBY,
-                        $FMMEMDATA,
-                        $FCPFORMULA,
-                        $FCFORMULAS,
-                        $FCROOTSEQ
-                    ]
-                );
+                $data = [
+                    'FCSKID' => $FCSKID_REFPROD,
+                    'FCRFTYPE' => $FCRFTYPE,
+                    'FCREFTYPE' => $FCREFTYPE,
+                    'FCDEPT' => $FCDEPT,
+                    'FCSECT' => $FCSECT,
+                    'FDDATE' => $FDDATE,
+                    'FCPROD' => $FCPROD,
+                    'FCREFPDTYP' => $FCREFPDTYP,
+                    'FCPRODTYPE' => $FCPRODTYPE,
+                    'FNQTY' => $FNQTY,
+                    'FNPRICE' => $FNPRICE,
+                    'FCUM' => $FCUM,
+                    'FCSEQ' => $FCSEQ,
+                    'FCIOTYPE' => $FCIOTYPE,
+                    'FCGLREF' => $FCSKID_GLREF,
+                    'FCWHOUSE' => $FCWHOUSE,
+                    'FCCREATEBY' => $FCCREATEBY,
+                    'FMMEMDATA' => $FMMEMDATA,
+                    'FCPFORMULA' => $FCPFORMULA,
+                    'FCFORMULAS' => $FCFORMULAS,
+                    'FCROOTSEQ' => $FCROOTSEQ
+                ];
+                RefProd::insertRefProdData($data);
             }
             $fcseq_counter++;
         }
+        // dd("test");
         return;
     }
 }
