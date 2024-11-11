@@ -62,4 +62,27 @@ class Glref extends Model
             ]
         );
     }
+
+    public static function insertGlrefDataStore($data)
+    {
+        return DB::connection('itc_wms')->statement(
+            'EXEC INSERT_TBL_GLREF ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+            [
+                $data['FCSKID'],
+                $data['FCRFTYPE'],
+                $data['FCREFTYPE'],
+                $data['FCDEPT'],
+                $data['FCSECT'],
+                $data['FDDATE'],
+                $data['FCBOOK'],
+                $data['FCCODE'],
+                $data['FCREFNO'],
+                $data['FNAMT'],
+                $data['FCFRWHOUSE'],
+                $data['FCTOWHOUSE'],
+                $data['FCCREATEBY'],
+                $data['FMMEMDATA']
+            ]
+        );
+    }
 }

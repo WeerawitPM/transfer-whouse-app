@@ -81,4 +81,34 @@ class RefProd extends Model
             'FCCREATEBY' => $data['FCCREATEBY'],
         ]);
     }
+
+    public static function insertRefProdDataStore($data)
+    {
+        DB::connection('itc_wms')->statement(
+            'EXEC INSERT_TBL_REFPROD ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
+            [
+                $data['FCSKID'], //FCSKID
+                $data['FCRFTYPE'],
+                $data['FCREFTYPE'],
+                $data['FCDEPT'],
+                $data['FCSECT'],
+                $data['FDDATE'],
+                $data['FCPROD'], //FCSKID ของ PROD
+                $data['FCREFPDTYP'],
+                $data['FCPRODTYPE'],
+                $data['FNQTY'],
+                $data['FNPRICE'],
+                $data['FCUM'],
+                $data['FCSEQ'],
+                $data['FCIOTYPE'],
+                $data['FCGLREF'], //FCGLREF
+                $data['FCWHOUSE'],
+                $data['FCCREATEBY'],
+                $data['FMMEMDATA'],
+                $data['FCPFORMULA'],
+                $data['FCFORMULAS'],
+                $data['FCROOTSEQ']
+            ]
+        );
+    }
 }

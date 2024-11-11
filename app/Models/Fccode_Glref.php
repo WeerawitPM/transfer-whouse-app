@@ -56,4 +56,13 @@ class Fccode_Glref extends Model
         // Return the FCCODE or set it to 0 if no result
         return $result ? (int) $result->FCCODE : 0;
     }
+
+    public static function get_frcode_glref_store($bookFcsKid, $year, $month)
+    {
+        $result = DB::connection('itc_wms')->selectOne(
+            'EXEC dbo.GET_FCCODE_GLREF ?, ?, ?',
+            [$bookFcsKid, $year, $month]
+        );
+        return $result? (int) $result->FCCODE : 0;
+    }
 }

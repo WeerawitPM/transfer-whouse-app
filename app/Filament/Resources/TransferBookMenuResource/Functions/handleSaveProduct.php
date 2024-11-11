@@ -17,12 +17,7 @@ class handleSaveProduct
         $current_month = now()->format("m");
         $current_date = now()->toDateString();
 
-        // $FCCODE_GLREF = DB::connection('itc_wms')->selectOne(
-        //     'EXEC dbo.GET_FCCODE_GLREF ?, ?, ?',
-        //     [$book_fcskid, $current_year, $current_month]
-        // );
-        // dd($FCCODE_GLREF->FCCODE);
-        $FCCODE_GLREF = Fccode_Glref::get_fccode_glref($book_fcskid, $current_year, $current_month);
+        $FCCODE_GLREF = Fccode_Glref::get_frcode_glref_store($book_fcskid, $current_year, $current_month);
         // dd($FCCODE_GLREF);
 
         $FCRFTYPE = RefType::where("FCSKID", $book->FCREFTYPE)->pluck("FCRFTYPE")->first();
@@ -70,7 +65,7 @@ class handleSaveProduct
                 'FCCREATEBY' => $FCCREATEBY,
                 'FMMEMDATA' => $FMMEMDATA
             ];
-            Glref::insertGlrefData($data);
+            Glref::insertGlrefDataStore($data);
             // dd($data);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +127,7 @@ class handleSaveProduct
                     'FCFORMULAS' => $FCFORMULAS,
                     'FCROOTSEQ' => $FCROOTSEQ
                 ];
-                RefProd::insertRefProdData($data);
+                RefProd::insertRefProdDataStore($data);
             }
             $fcseq_counter++;
         }
