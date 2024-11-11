@@ -192,7 +192,7 @@
             if (isValid) {
                 partData.push({
                     FCSKID: FCSKID,
-                    FCCODE: FCCODE,
+                    part_no: FCCODE,
                     FCSNAME: FCSNAME,
                     FCNAME: FCNAME,
                     MODEL: MODEL,
@@ -241,6 +241,8 @@
 
     function confirmSaveModal() {
         // console.log(partData);
+        const btn_save = document.getElementById('btn_save');
+        btn_save.style.display = "none";
         @this.$dispatch('close-modal', {
             id: 'confirmSaveModal'
         });

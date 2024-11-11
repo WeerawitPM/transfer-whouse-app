@@ -3,12 +3,7 @@
 namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
-use App\Models\Book;
-use App\Models\FormulaFormulas;
-use App\Models\JobDetail;
-use App\Models\JobHead;
 use App\Models\JobToTag;
-use App\Models\RefType;
 use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Actions\Action;
@@ -22,9 +17,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
 use Auth;
-use App\Filament\Resources\TransferBookMenuResource\Functions\handleJob;
 use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveProduct;
 use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveWrProduct;
 
@@ -191,8 +184,9 @@ class ScanTag extends Page implements HasTable
 
         $user = Auth::user();
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
-        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user);
-        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user);
+        $remark = "Scan";
+        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark);
+        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark);
         // handleJob::handleUpdateJobHead($job_id);
         // handleJob::handleUpdateJobToTag($jobToTag);
         // handleJob::handleUpdateJobDetail($jobDetail);

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class handleSaveProduct
 {
-    public static function handleSaveProduct($jobDetail, $book, $user)
+    public static function handleSaveProduct($jobDetail, $book, $user, $remark)
     {
         $book_fcskid = $book->FCSKID;
         $current_year = now()->year;
@@ -32,7 +32,7 @@ class handleSaveProduct
         $FCFRWHOUSE = $book->from_whs->FCSKID;
         $FCTOWHOUSE = $book->to_whs->FCSKID;
         $FCCREATEBY = $user->emplr->FCSKID;
-        $FMMEMDATA = "Scan";
+        $FMMEMDATA = $remark;
 
         $fcseq_counter = 1;
 

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class handleSaveWrProduct
 {
-    public static function handleSaveWrProduct($jobDetail, $user)
+    public static function handleSaveWrProduct($jobDetail, $user, $remark)
     {
         $book = Book::where('FCREFTYPE', 'WR')->where('FCCODE', '0001')->get()->first();
         $book_fcskid = $book->FCSKID;
@@ -34,7 +34,7 @@ class handleSaveWrProduct
         $FCFRWHOUSE = $book->from_whs->FCSKID;
         $FCTOWHOUSE = $book->to_whs->FCSKID;
         $FCCREATEBY = $user->emplr->FCSKID;
-        $FMMEMDATA = "Scan";
+        $FMMEMDATA = $remark;
 
         $fcseq_counter_mom = 01;
 

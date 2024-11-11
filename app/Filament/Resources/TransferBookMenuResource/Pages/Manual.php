@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 use App\Filament\Resources\TransferBookMenuResource;
 use App\Models\FormulaStockProd;
 use App\Models\SetupTag;
+use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Route;
 use Filament\Tables\Contracts\HasTable;
@@ -13,10 +14,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
+use Auth;
+use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveProduct;
+use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveWrProduct;
 
 class Manual extends Page implements HasTable
 {
@@ -184,7 +187,7 @@ class Manual extends Page implements HasTable
             if ($setupTag) {
                 // ถ้าพบข้อมูล ให้ทำการอัปเดต
                 $setupTag->update([
-                    'FCCODE' => $item['FCCODE'],
+                    'FCCODE' => $item['part_no'],
                     'FCSNAME' => $item['FCSNAME'],
                     'FCNAME' => $item['FCNAME'],
                     'packing_qty' => $item['packing_qty'],
@@ -193,13 +196,20 @@ class Manual extends Page implements HasTable
                 // ถ้าไม่พบข้อมูล ให้สร้างใหม่
                 SetupTag::create([
                     'FCSKID' => $item['FCSKID'],
-                    'FCCODE' => $item['FCCODE'],
+                    'FCCODE' => $item['part_no'],
                     'FCSNAME' => $item['FCSNAME'],
                     'FCNAME' => $item['FCNAME'],
                     'packing_qty' => $item['packing_qty'],
                 ]);
             }
         }
+        // dd($data);
+
+        $user = Auth::user();
+        $book = TransferBook::where('id', $this->id)->get()->first()->book;
+        $remark = "Manual";
+        handleSaveProduct::handleSaveProduct($data, $book, $user, $remark);
+        handleSaveWrProduct::handleSaveWrProduct($data, $user, $remark);
 
         $this->handleNotification("แจ้งเตือน", "บันทึกข้อมูลสำเร็จ", "success");
 

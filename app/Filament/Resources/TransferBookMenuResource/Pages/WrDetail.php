@@ -4,7 +4,14 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
 // use Filament\Actions\Action;
+use App\Filament\Resources\TransferBookMenuResource\Functions\printDocument;
+use App\Filament\Resources\TransferBookMenuResource\Functions\printTag;
+use App\Filament\Resources\TransferBookMenuResource\Functions\saveJob;
+use App\Models\JobHead;
+use App\Models\TransferBook;
 use App\Models\VcstTrack;
+use App\Models\VcstTrackDetail;
+use Auth;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\DatePicker;
 // use Filament\Forms\Components\Section;
@@ -16,6 +23,8 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Route; // Import Route facade
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
 
 class WrDetail extends Page implements HasTable
 {
@@ -53,15 +62,16 @@ class WrDetail extends Page implements HasTable
 
     protected function getTableData()
     {
+        return VcstTrack::getTrack("2024-11-11", "2024-11-11");
         // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
-        if ($this->startDate && $this->endDate) {
-            return VcstTrack::getTrack($this->startDate, $this->endDate);
-        }
+        // if ($this->startDate && $this->endDate) {
+        //     return VcstTrack::getTrack($this->startDate, $this->endDate);
+        // }
 
-        // return VcstTrack::getTrack('2024-10-29', '2024-10-31');
-        return VcstTrack::query()
-            //return null
-            ->where('JOB_NO', 'Hello World');
+        // // return VcstTrack::getTrack('2024-10-29', '2024-10-31');
+        // return VcstTrack::query()
+        //     //return null
+        //     ->where('JOB_NO', 'Hello World');
     }
 
     public function table(Table $table): Table
@@ -72,6 +82,7 @@ class WrDetail extends Page implements HasTable
             ->query(fn() => $this->getTableData())
             ->columns([
                 TextColumn::make('JOB_NO')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('CPART_NO')
                     ->sortable(),
@@ -102,7 +113,9 @@ class WrDetail extends Page implements HasTable
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                // ...
+                BulkAction::make('print')
+                    // ->requiresConfirmation()
+                    ->action(fn(Collection $records) => $this->print_tag($records))
             ]);
     }
 
@@ -117,5 +130,61 @@ class WrDetail extends Page implements HasTable
 
         // Add the logic to handle form submission
         // dd($this->endDate);
+    }
+
+    public function print_tag($records)
+    {
+        // dd($records);
+        foreach ($records as $record) {
+            $track_detail = VcstTrackDetail::getTrackDetail($record->JOB_NO, $record->CPART_NO)->get()->toArray();
+            // dd($track_detail);
+            $this->generate_document($track_detail, $record->JOB_NO);
+            printDocument::print_document($record->JOB_NO);
+            printTag::print_tags($record->JOB_NO);
+        }
+    }
+
+    public function generate_document($data, $job_no)
+    {
+        $from_whs_get = TransferBook::query()
+            ->where('id', $this->id)
+            ->with('book.from_whs')
+            ->first();
+        $from_whs = $from_whs_get->book->from_whs->FCCODE ?? null;
+
+        $to_whs_get = TransferBook::query()
+            ->where('id', $this->id)
+            ->with('book.to_whs')
+            ->first();
+        $to_whs = $to_whs_get->book->to_whs->FCCODE ?? null;
+
+        // dd($from_whs, $to_whs);
+
+        $whouse = '';
+        if ($to_whs == 'XXX') {
+            $whouse = '005';
+        }
+
+        $user_id = Auth::user()->id;
+        $department = Auth::user()->dept->FCNAME;
+        $created_date = date('Y-m-d');
+
+        $jobHead = JobHead::firstOrCreate(
+            ['job_no' => $job_no],
+            [
+                'doc_no' => $job_no,
+                'doc_ref_no' => $job_no,
+                'department' => $department,
+                'from_whs' => $from_whs,
+                'to_whs' => $to_whs,
+                'status' => 0,
+                'created_date' => $created_date,
+                'user_id' => $user_id,
+            ]
+        );
+        $jobHead->save();
+
+        saveJob::saveJobToTag($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date, $data);
+        saveJob::saveJobDetail($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date);
     }
 }
