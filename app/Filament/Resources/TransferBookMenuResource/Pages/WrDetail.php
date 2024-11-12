@@ -62,16 +62,15 @@ class WrDetail extends Page implements HasTable
 
     protected function getTableData()
     {
-        return VcstTrack::getTrack("2024-11-11", "2024-11-11");
         // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
-        // if ($this->startDate && $this->endDate) {
-        //     return VcstTrack::getTrack($this->startDate, $this->endDate);
-        // }
+        if ($this->startDate && $this->endDate) {
+            return VcstTrack::getTrack($this->startDate, $this->endDate);
+        }
 
         // // return VcstTrack::getTrack('2024-10-29', '2024-10-31');
-        // return VcstTrack::query()
-        //     //return null
-        //     ->where('JOB_NO', 'Hello World');
+        return VcstTrack::query()
+            //return null
+            ->where('JOB_NO', 'Hello World');
     }
 
     public function table(Table $table): Table
@@ -134,14 +133,43 @@ class WrDetail extends Page implements HasTable
 
     public function print_tag($records)
     {
-        // dd($records);
-        foreach ($records as $record) {
-            $track_detail = VcstTrackDetail::getTrackDetail($record->JOB_NO, $record->CPART_NO)->get()->toArray();
-            // dd($track_detail);
-            $this->generate_document($track_detail, $record->JOB_NO);
-            printDocument::print_document($record->JOB_NO);
-            // printTag::print_tags($record->JOB_NO);
+        $zip = new \ZipArchive();
+        $zipFileName = storage_path('app/public/documents.zip');
+        $pdfFiles = [];  // เก็บ paths ของไฟล์ PDF ที่สร้างขึ้น
+
+        if ($zip->open($zipFileName, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+            foreach ($records as $record) {
+                $track_detail = VcstTrackDetail::getTrackDetail($record->JOB_NO, $record->CPART_NO)->get()->toArray();
+                $this->generate_document($track_detail, $record->JOB_NO);
+
+                // รับ path ของไฟล์ PDF ที่สร้างขึ้นจาก printDocument
+                $documentPath = printDocument::print_document($record->JOB_NO);
+                if ($documentPath) {
+                    $zip->addFile($documentPath, basename($documentPath));
+                    $pdfFiles[] = $documentPath; // เก็บ path ของไฟล์ PDF ไว้สำหรับลบภายหลัง
+                }
+
+                // รับ path ของไฟล์ PDF ที่สร้างขึ้นจาก printTag
+                $tagPath = printTag::print_tags($record->JOB_NO);
+                if ($tagPath) {
+                    $zip->addFile($tagPath, basename($tagPath));
+                    $pdfFiles[] = $tagPath; // เก็บ path ของไฟล์ PDF ไว้สำหรับลบภายหลัง
+                }
+            }
+            $zip->close();
+        } else {
+            return response()->json(['error' => 'Failed to create zip file.'], 500);
         }
+
+        // ลบไฟล์ PDF ที่เก็บไว้หลังจาก ZIP เสร็จสิ้น
+        foreach ($pdfFiles as $pdfFile) {
+            if (file_exists($pdfFile)) {
+                unlink($pdfFile);
+            }
+        }
+
+        // ดาวน์โหลด ZIP ไฟล์
+        return response()->download($zipFileName)->deleteFileAfterSend(true);
     }
 
     public function generate_document($data, $job_no)
