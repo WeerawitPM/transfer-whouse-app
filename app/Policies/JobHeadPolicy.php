@@ -15,7 +15,7 @@ class JobHeadPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_job::head');
+        return $user->can('view_any_re::print');
     }
 
     /**
@@ -23,7 +23,7 @@ class JobHeadPolicy
      */
     public function view(User $user, JobHead $jobHead): bool
     {
-        return $user->can('view_job::head');
+        return $user->can('view_re::print');
     }
 
     /**
@@ -31,7 +31,7 @@ class JobHeadPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_job::head');
+        return $user->can('create_re::print');
     }
 
     /**
@@ -39,7 +39,7 @@ class JobHeadPolicy
      */
     public function update(User $user, JobHead $jobHead): bool
     {
-        return $user->can('update_job::head');
+        return $user->can('update_re::print');
     }
 
     /**
@@ -47,7 +47,7 @@ class JobHeadPolicy
      */
     public function delete(User $user, JobHead $jobHead): bool
     {
-        return $user->can('delete_job::head');
+        return $user->can('delete_re::print');
     }
 
     /**
@@ -55,7 +55,7 @@ class JobHeadPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_job::head');
+        return $user->can('delete_any_re::print');
     }
 
     /**
@@ -63,7 +63,7 @@ class JobHeadPolicy
      */
     public function forceDelete(User $user, JobHead $jobHead): bool
     {
-        return $user->can('force_delete_job::head');
+        return $user->can('force_delete_re::print');
     }
 
     /**
@@ -71,7 +71,7 @@ class JobHeadPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_job::head');
+        return $user->can('force_delete_any_re::print');
     }
 
     /**
@@ -79,7 +79,7 @@ class JobHeadPolicy
      */
     public function restore(User $user, JobHead $jobHead): bool
     {
-        return $user->can('restore_job::head');
+        return $user->can('restore_re::print');
     }
 
     /**
@@ -87,7 +87,7 @@ class JobHeadPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_job::head');
+        return $user->can('restore_any_re::print');
     }
 
     /**
@@ -95,7 +95,7 @@ class JobHeadPolicy
      */
     public function replicate(User $user, JobHead $jobHead): bool
     {
-        return $user->can('replicate_job::head');
+        return $user->can('replicate_re::print');
     }
 
     /**
@@ -103,6 +103,6 @@ class JobHeadPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_job::head');
+        return $user->can('reorder_re::print');
     }
 }

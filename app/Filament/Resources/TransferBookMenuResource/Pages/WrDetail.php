@@ -62,9 +62,14 @@ class WrDetail extends Page implements HasTable
 
     protected function getTableData()
     {
+        // ดึง `job_no` ทั้งหมดจาก `JobHead`
+        $jobNosInJobHead = JobHead::all()->pluck('job_no')->toArray();
+
         // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
         if ($this->startDate && $this->endDate) {
-            return VcstTrack::getTrack($this->startDate, $this->endDate);
+            return VcstTrack::getTrack($this->startDate, $this->endDate)
+                ->whereNotIn('JOB_NO', $jobNosInJobHead);
+            ;
         }
 
         // // return VcstTrack::getTrack('2024-10-29', '2024-10-31');
@@ -81,13 +86,19 @@ class WrDetail extends Page implements HasTable
             ->query(fn() => $this->getTableData())
             ->columns([
                 TextColumn::make('JOB_NO')
+                    ->label('Job No')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('CPART_NO')
+                    ->label('Part No')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('FCSNAME')
+                    ->label('Part Code')
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('FCNAME')
+                    ->label('Part Name')
                     ->sortable(),
                 TextColumn::make('STARTDATE')->date('Y-m-d')
                     ->sortable(),
@@ -114,7 +125,7 @@ class WrDetail extends Page implements HasTable
             ->bulkActions([
                 BulkAction::make('print')
                     // ->requiresConfirmation()
-                    ->action(fn(Collection $records) => $this->print_tag($records))
+                    ->action(fn(Collection $records) => $this->print($records))
             ]);
     }
 
@@ -131,7 +142,7 @@ class WrDetail extends Page implements HasTable
         // dd($this->endDate);
     }
 
-    public function print_tag($records)
+    public function print($records)
     {
         $zip = new \ZipArchive();
         $zipFileName = storage_path('app/public/documents.zip');

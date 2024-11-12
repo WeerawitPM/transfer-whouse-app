@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
+use App\Filament\Resources\TransferBookMenuResource\Functions\handleJob;
 use App\Models\JobToTag;
 use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
@@ -188,7 +189,7 @@ class ScanTag extends Page implements HasTable
         handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark);
         handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark);
         // handleJob::handleUpdateJobHead($job_id);
-        // handleJob::handleUpdateJobToTag($jobToTag);
+        handleJob::handleUpdateJobToTag($jobToTag);
         // handleJob::handleUpdateJobDetail($jobDetail);
         Notification::make()
             ->title('Scan tag ครบแล้ว')

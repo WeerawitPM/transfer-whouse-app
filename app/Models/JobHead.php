@@ -23,4 +23,14 @@ class JobHead extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function jobToTags()
+    {
+        return $this->hasMany(JobToTag::class, 'job_id');
+    }
+
+    public function jobDetails()
+    {
+        return $this->hasMany(JobDetail::class, 'job_id');
+    }
 }

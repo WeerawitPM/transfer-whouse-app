@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
+use Auth;
 
 class JobHeadResource extends Resource
 {
@@ -18,6 +19,12 @@ class JobHeadResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Job';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        // ตรวจสอบว่า user ที่ล็อกอินมี role เป็น 'user' หรือไม่
+        return !Auth::user()->hasRole('user');
+    }
 
     public static function form(Form $form): Form
     {
