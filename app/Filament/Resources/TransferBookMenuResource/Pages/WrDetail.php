@@ -140,7 +140,7 @@ class WrDetail extends Page implements HasTable
             // dd($track_detail);
             $this->generate_document($track_detail, $record->JOB_NO);
             printDocument::print_document($record->JOB_NO);
-            printTag::print_tags($record->JOB_NO);
+            // printTag::print_tags($record->JOB_NO);
         }
     }
 

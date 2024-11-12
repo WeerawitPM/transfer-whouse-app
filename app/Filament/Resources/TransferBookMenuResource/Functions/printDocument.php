@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TransferBookMenuResource\Functions;
 use App\Models\JobHead;
 use Illuminate\Support\Facades\Http;
 use Filament\Notifications\Notification;
+use Auth;
 
 class printDocument
 {
@@ -31,11 +32,12 @@ class printDocument
                 ->get($urlReport);
 
             if ($response->successful()) {
-                $recipient = auth()->user();
+                $recipient = Auth::user();
+                // dd($recipient);
                 Notification::make()
                     ->title('ปริ้น Document สำเร็จ')
                     ->success()
-                    ->body($urlReport)
+                    ->body("You can download your document [here]($urlReport).")
                     ->color('success')
                     ->sendToDatabase($recipient);
                 return response()->streamDownload(function () use ($response) {

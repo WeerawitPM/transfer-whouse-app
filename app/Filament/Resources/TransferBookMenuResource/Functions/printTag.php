@@ -5,6 +5,8 @@ namespace App\Filament\Resources\TransferBookMenuResource\Functions;
 use App\Models\JobHead;
 use Illuminate\Support\Facades\Http;
 use Filament\Notifications\Notification;
+use Auth;
+
 
 class printTag
 {
@@ -30,11 +32,14 @@ class printTag
                 ->get($urlReport);
 
             if ($response->successful()) {
+                $recipient = Auth::user();
+                // dd($recipient);
                 Notification::make()
                     ->title('ปริ้น Tag สำเร็จ')
                     ->success()
+                    ->body("You can download your tag [here]($urlReport).")
                     ->color('success')
-                    ->send();
+                    ->sendToDatabase($recipient);
                 return response()->streamDownload(function () use ($response) {
                     echo $response->body();
                 }, $file_name, [
