@@ -33,6 +33,11 @@ class RePrintResource extends Resource
     protected static ?string $pluralLabel = 'Re-Print';
     protected static ?string $navigationGroup = 'Print';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form

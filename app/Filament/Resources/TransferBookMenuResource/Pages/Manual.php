@@ -209,7 +209,7 @@ class Manual extends Page implements HasTable
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
         $remark = "Manual";
         handleSaveProduct::handleSaveProduct($data, $book, $user, $remark);
-        handleSaveWrProduct::handleSaveWrProduct($data, $user, $remark);
+        // handleSaveWrProduct::handleSaveWrProduct($data, $user, $remark);
 
         $this->handleNotification("แจ้งเตือน", "บันทึกข้อมูลสำเร็จ", "success");
 

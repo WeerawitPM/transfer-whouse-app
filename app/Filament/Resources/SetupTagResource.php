@@ -18,6 +18,11 @@ class SetupTagResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Setup';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -86,10 +91,13 @@ class SetupTagResource extends Resource
                 Tables\Columns\TextColumn::make('FCSKID')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCCODE')
+                    ->label('Part No')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCSNAME')
+                    ->label('Part Code')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCNAME')
+                    ->label('Part Name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('packing_name')
                     ->searchable(),
