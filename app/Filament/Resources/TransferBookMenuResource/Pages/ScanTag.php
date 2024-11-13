@@ -126,25 +126,16 @@ class ScanTag extends Page
     public function handleSave()
     {
         $jobToTag = $this->tags;
+        $jobDetail = $this->tags_detail;
 
-        // สร้าง array เพื่อเก็บจำนวนรวมของแต่ละ part_no ใน JobToTag
-        $jobDetail = [];
-        foreach ($jobToTag as $tag) {
-            $partNo = $tag['part_no'];
-
-            // ถ้า part_no นี้มีอยู่ใน jobDetail แล้ว ให้รวม qty เข้าด้วยกัน
-            if (isset($jobDetail[$partNo])) {
-                $jobDetail[$partNo]['qty'] += $tag['qty'];
-            } else {
-                // ถ้ายังไม่มี part_no นี้ใน jobDetail ให้เพิ่มเข้าไป
-                $jobDetail[$partNo] = $tag;
-            }
+        if (empty($jobToTag)) {
+            Notification::make()
+            ->title('เกิดข้อผิดพลาด ไม่มีข้อมูลที่จะบันทึก')
+            ->danger()
+            ->color('danger')
+            ->send();
+            return;
         }
-
-        // แปลง jobDetail กลับเป็น array เพื่อให้ง่ายต่อการใช้งาน
-        $jobDetail = array_values($jobDetail);
-
-        // dd($jobDetail);
 
         $user = Auth::user();
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
@@ -155,11 +146,12 @@ class ScanTag extends Page
         handleJob::handleUpdateJobToTag($jobToTag);
         // handleJob::handleUpdateJobDetail($jobDetail);
         Notification::make()
-            ->title('Scan tag ครบแล้ว')
+            ->title('Scan tag สำเร็จ')
             ->success()
             ->color('success')
             ->send();
         $this->tags = [];
+        $this->tags_detail = [];
 
         // Debug ข้อมูล
         // dd($jobToTag, $jobDetail, $jobToTagQuantities, $isComplete);
