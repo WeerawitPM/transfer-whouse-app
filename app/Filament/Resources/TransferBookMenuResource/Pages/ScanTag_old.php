@@ -7,7 +7,14 @@ use App\Filament\Resources\TransferBookMenuResource\Functions\handleJob;
 use App\Models\JobToTag;
 use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Facades\Route;
+use Filament\Tables\Table;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Notifications\Notification;
@@ -16,22 +23,19 @@ use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveProduct;
 use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveWrProduct;
 
 
-class ScanTag extends Page
+class ScanTag_old extends Page implements HasTable
 {
-    // use InteractsWithTable;
+    use InteractsWithTable;
     protected static string $resource = TransferBookMenuResource::class;
     protected static string $view = 'filament.resources.transfer-book-menu-resource.pages.scan-tag';
     public $id;
     public $input_qr_code;
-    public $tags;
-    public $tags_detail;
+    public $qr_code_array;
 
     public function mount()
     {
         $this->id = Route::current()->parameter('record'); // Get the ID from the route parameters
         $this->input_qr_code = ''; // Initialize input_qr_code
-        $this->tags = [];
-        $this->tags_detail = [];
     }
 
     protected function getActions(): array
@@ -63,8 +67,6 @@ class ScanTag extends Page
         }
 
         $tag = JobToTag::where('qr_code', $state)->get()->first();
-        // dd($tag);
-        // dd($tag['qr_code']);
         // dd($tag->part_no);
         if ($tag) {
             if ($tag->status == 1) {
@@ -75,8 +77,8 @@ class ScanTag extends Page
                     ->send();
                 return;
             } else {
-                $this->tags[] = $tag->toArray();
-                $this->updateTagsDetail();
+                $this->qr_code_array[] = $state;
+                $this->resetTable();
                 return;
             }
         } else {
@@ -89,43 +91,78 @@ class ScanTag extends Page
         }
     }
 
-    public function updateTagsDetail()
+    public function table(Table $table): Table
     {
-        $tagsGrouped = [];
+        $query = JobToTag::query()->whereIn('qr_code', $this->qr_code_array ?? []);
+        $partNoOptions = $query->pluck('part_no', 'part_no')->toArray();
 
-        // Group tags by part_no and calculate qty and tag_qty
-        foreach ($this->tags as $tag) {
-            $part_no = $tag['part_no'];
+        return $table
+            ->paginated(false)
+            ->defaultSort('qr_code', 'desc')
+            ->query(
+                $query,
+            )
+            ->columns([
+                ImageColumn::make('image')
+                    ->label('image'),
+                TextColumn::make('qr_code')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('part_no')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('part_code')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('part_name')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('model')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('qty')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('packing_name')
+                    ->searchable(),
+                TextColumn::make('from_whs')
+                    ->searchable(),
+                TextColumn::make('to_whs')
+                    ->searchable(),
+            ])
+            ->filters([
+                SelectFilter::make('part_no')
+                    ->label('Part No')
+                    ->options($partNoOptions),
+            ])
+            ->actions([
+                Action::make('Delete')
+                    ->label('Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->button()
+                    ->action(fn($record) => $this->handleDelete($record->qr_code))
+            ])
+            ->bulkActions([
+                // Define bulk actions if needed
+            ]);
+    }
 
-            if (!isset($tagsGrouped[$part_no])) {
-                // Initialize data for this part_no
-                $tagsGrouped[$part_no] = [
-                    'part_no' => $tag['part_no'],
-                    'part_code' => $tag['part_code'],
-                    'part_name' => $tag['part_name'],
-                    'model' => $tag['model'],
-                    'qty' => 0, // Initialize total qty
-                    'packing_name' => $tag['packing_name'],
-                    'whouse' => $tag['whouse'],
-                    'from_whs' => $tag['from_whs'],
-                    'to_whs' => $tag['to_whs'],
-                    'tag_qty' => 0, // Initialize tag count
-                ];
-            }
-
-            // Accumulate the qty and tag_qty for each part_no
-            $tagsGrouped[$part_no]['qty'] += $tag['qty'];
-            $tagsGrouped[$part_no]['tag_qty']++;
-        }
-
-        // Update tags_detail with the grouped data
-        $this->tags_detail = array_values($tagsGrouped);
-        // dd($this->tags_detail);
+    public function handleDelete($qr_code)
+    {
+        // Remove the selected QR code from qr_code_array
+        $this->qr_code_array = array_filter(
+            $this->qr_code_array,
+            fn($item) => $item !== $qr_code
+        );
+        // dd($qr_code);
+        $this->resetTable();
     }
 
     public function handleSave()
     {
-        $jobToTag = $this->tags;
+        // ดึงข้อมูลจาก JobToTag
+        $jobToTag = $this->getTableRecords()->toArray();
 
         // สร้าง array เพื่อเก็บจำนวนรวมของแต่ละ part_no ใน JobToTag
         $jobDetail = [];
@@ -159,53 +196,10 @@ class ScanTag extends Page
             ->success()
             ->color('success')
             ->send();
-        $this->tags = [];
+        $this->qr_code_array = [];
+        $this->resetTable();
 
         // Debug ข้อมูล
         // dd($jobToTag, $jobDetail, $jobToTagQuantities, $isComplete);
-    }
-
-    public function handleDeleteTag($index)
-    {
-        // Remove the selected item from $tags array
-        if (isset($this->tags[$index])) {
-            unset($this->tags[$index]);
-            $this->tags = array_values($this->tags); // Re-index the array after deletion
-        }
-
-        Notification::make()
-            ->title('ลบข้อมูลเรียบร้อยแล้ว')
-            ->success()
-            ->color('success')
-            ->send();
-    }
-
-    public function handleDeleteTagDetail($index)
-    {
-        // Check if the index exists in tags_detail
-        if (isset($this->tags_detail[$index])) {
-            $part_no_to_delete = $this->tags_detail[$index]['part_no'];
-
-            // Remove the selected item from tags_detail
-            unset($this->tags_detail[$index]);
-            $this->tags_detail = array_values($this->tags_detail); // Re-index tags_detail after deletion
-
-            // Remove all items from tags that have the same part_no
-            $this->tags = array_filter($this->tags, function ($tag) use ($part_no_to_delete) {
-                return $tag['part_no'] !== $part_no_to_delete;
-            });
-
-            // Re-index tags after filtering
-            $this->tags = array_values($this->tags);
-
-            // Update tags_detail based on remaining tags
-            $this->updateTagsDetail();
-
-            Notification::make()
-                ->title('ลบข้อมูลเรียบร้อยแล้ว')
-                ->success()
-                ->color('success')
-                ->send();
-        }
     }
 }
