@@ -96,7 +96,7 @@ class handleSaveWrProduct
                 }
 
                 $FCPROD = $product->FCSKID;
-                $FCREFPDTYP = "P";
+                $FCREFPDTYP = "F";
                 $FCPRODTYPE = $product->FCTYPE;
                 $FNQTY = $FNAMT;
                 $FNPRICE = $FNQTY * $product->FNSTDCOST;

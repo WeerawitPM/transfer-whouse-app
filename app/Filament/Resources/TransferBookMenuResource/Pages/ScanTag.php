@@ -41,6 +41,7 @@ class ScanTag extends Page
                 ->label('Save')
                 ->color('primary')
                 ->action('handleSave')
+                ->requiresConfirmation()
             // ->icon('heroicon-o-cloud'),
         ];
     }
@@ -75,6 +76,17 @@ class ScanTag extends Page
                     ->send();
                 return;
             } else {
+                // Check if the qr_code already exists in tags
+                $existingTag = collect($this->tags)->firstWhere('qr_code', $tag->qr_code);
+                if ($existingTag) {
+                    Notification::make()
+                        ->title('Tag นี้ถูกเพิ่มแล้ว')
+                        ->warning()
+                        ->color('warning')
+                        ->send();
+                    return;
+                }
+                
                 $this->tags[] = $tag->toArray();
                 $this->updateTagsDetail();
                 return;
@@ -130,10 +142,10 @@ class ScanTag extends Page
 
         if (empty($jobToTag)) {
             Notification::make()
-            ->title('เกิดข้อผิดพลาด ไม่มีข้อมูลที่จะบันทึก')
-            ->danger()
-            ->color('danger')
-            ->send();
+                ->title('เกิดข้อผิดพลาด ไม่มีข้อมูลที่จะบันทึก')
+                ->danger()
+                ->color('danger')
+                ->send();
             return;
         }
 
