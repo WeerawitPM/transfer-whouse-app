@@ -21,7 +21,7 @@
     </x-filament::modal>
 
     <!-- Table -->
-    <div class="mt-4 overflow-x-auto border rounded-lg">
+    <div class="mt-4 overflow-x-auto border dark:border-none rounded-lg">
         <table id="partsTable" class="w-full table-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
             <thead
                 class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">

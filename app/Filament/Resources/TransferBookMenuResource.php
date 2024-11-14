@@ -85,6 +85,12 @@ class TransferBookMenuResource extends Resource
                     ->button()
                     ->url(fn(TransferBook $record): string => self::getUrl('wr_detail', ['record' => $record]))
                     ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE === 'WR'),
+                Tables\Actions\Action::make('detail')
+                    ->label('Detail')
+                    ->color('primary')
+                    ->button()
+                    ->url(fn(TransferBook $record): string => self::getUrl('detail', ['record' => $record]))
+                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
                 // ->openUrlInNewTab()
             ])
             ->striped();
@@ -105,6 +111,8 @@ class TransferBookMenuResource extends Resource
             'wr_print' => Pages\WrPrint::route('/{record}/wr_print'),
             'scan_tag' => Pages\ScanTag::route('/{record}/scan_tag'),
             'manual' => Pages\Manual::route('/{record}/manual'),
+            'detail' => Pages\Detail::route('/{record}/detail'),
+            'detail_print' => Pages\DetailPrint::route('/{record}/detail_print'),
         ];
     }
 }

@@ -9,6 +9,8 @@ class Fccode_Glref extends Model
 {
     protected $connection = 'formula';
     protected $table = 'GLREF';
+    protected $primaryKey = 'FCSKID';
+    protected $keyType = 'string';
 
     /**
      * Get the next FCCODE for a given year and month.
@@ -63,6 +65,28 @@ class Fccode_Glref extends Model
             'EXEC dbo.GET_FCCODE_GLREF ?, ?, ?',
             [$bookFcsKid, $year, $month]
         );
-        return $result? (int) $result->FCCODE : 0;
+        return $result ? (int) $result->FCCODE : 0;
+    }
+
+    public static function get_job($book_fcskid, $start_date, $end_date)
+    {
+        return self::selectRaw('
+                GLREF.FCSKID as FCSKID,
+                LTRIM(RTRIM(GLREF.FCCODE)) as DOC_NO,
+                LTRIM(RTRIM(GLREF.FCREFNO)) as REF_NO,
+                GLREF.FDDATE,
+                LTRIM(RTRIM(wf.FCCODE)) as FROM_WHS,
+                LTRIM(RTRIM(wt.FCCODE)) as TO_WHS,
+                LTRIM(RTRIM(s.FCNAME)) as SECT
+        ')
+            ->join('FORMULA.dbo.WHOUSE as wf', 'wf.FCSKID', '=', 'GLREF.FCFRWHOUSE')
+            ->join('FORMULA.dbo.WHOUSE as wt', 'wt.FCSKID', '=', 'GLREF.FCTOWHOUSE')
+            ->join('SECT as s', function ($join) {
+                $join->on('s.FCSKID', '=', 'GLREF.FCSECT')
+                    ->on('s.FCDEPT', '=', 'GLREF.FCDEPT');
+            })
+            ->where('GLREF.FCBOOK', $book_fcskid)
+            ->whereBetween(DB::raw("CONVERT(date, GLREF.FDDATE, 103)"), [$start_date, $end_date])
+            ->where('GLREF.FCSTAT', '<>', 'C');
     }
 }

@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Tables\Actions\ViewAction;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
@@ -152,7 +153,23 @@ class RePrintResource extends Resource
             ->actions([
                 ViewAction::make()
                     ->button()
-                    ->color('primary')
+                    ->color('primary'),
+                Action::make("print_document")
+                    ->button()
+                    ->icon('heroicon-o-printer')
+                    ->label('Document')
+                    ->action(function ($record) {
+                        // dd($record->job_no);
+                        return printDocument::print_document_one($record->job_no);
+                    }),
+                Action::make("print_tag")
+                    ->button()
+                    ->icon('heroicon-o-printer')
+                    ->label('Tags')
+                    ->action(function ($record) {
+                        // dd($record->job_no);
+                        return printTag::print_tags_one($record->job_no);
+                    }),
             ])
             ->bulkActions([
                 BulkAction::make('print')
