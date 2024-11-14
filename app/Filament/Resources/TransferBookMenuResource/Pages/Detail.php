@@ -70,7 +70,7 @@ class Detail extends Page implements HasTable
 
         // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
         if ($this->startDate && $this->endDate) {
-            return Fccode_Glref::get_job($this->book->FCSKID, $this->startDate, $this->endDate)
+            return Fccode_Glref::get_glref($this->book->FCSKID, $this->startDate, $this->endDate)
                 ->whereNotIn('FCREFNO', $jobNosInJobHead);
         }
 

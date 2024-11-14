@@ -68,7 +68,7 @@ class Fccode_Glref extends Model
         return $result ? (int) $result->FCCODE : 0;
     }
 
-    public static function get_job($book_fcskid, $start_date, $end_date)
+    public static function get_glref($book_fcskid, $start_date, $end_date)
     {
         return self::selectRaw('
                 GLREF.FCSKID as FCSKID,
@@ -88,5 +88,39 @@ class Fccode_Glref extends Model
             ->where('GLREF.FCBOOK', $book_fcskid)
             ->whereBetween(DB::raw("CONVERT(date, GLREF.FDDATE, 103)"), [$start_date, $end_date])
             ->where('GLREF.FCSTAT', '<>', 'C');
+    }
+
+    public static function get_glref_prod($glref_fcskid)
+    {
+        return self::selectRaw('
+            GLREF.FCSKID AS FCSKID,
+            LTRIM(RTRIM(GLREF.FCCODE)) AS DOC_NO,
+            LTRIM(RTRIM(GLREF.FCREFNO)) AS REF_NO,
+            GLREF.FDDATE,LTRIM(RTRIM(WF.FCCODE)) AS FROM_WHS,
+            LTRIM(RTRIM(WT.FCCODE)) AS TO_WHS,
+            LTRIM(RTRIM(S.FCNAME)) AS DEPARTMENT,
+            LTRIM(RTRIM(P.FCCODE)) AS PART_NO,
+            LTRIM(RTRIM(P.FCSNAME)) AS PART_CODE,
+            LTRIM(RTRIM(P.FCNAME)) AS PART_NAME, 
+            LTRIM(RTRIM(PD.FCCODE)) AS MODEL, 
+            LTRIM(RTRIM(R.FCPRODTYPE)) AS FCPROTYPE, 
+            LTRIM(RTRIM(R.FCREFPDTYP)) AS FCREFPDTYP,
+            R.FNQTY AS QTY,
+            LTRIM(RTRIM(U.FCNAME)) AS UNIT
+        ')
+            ->join('FORMULA.dbo.WHOUSE as WF', 'WF.FCSKID', '=', 'GLREF.FCFRWHOUSE')
+            ->join('FORMULA.dbo.WHOUSE as WT', 'WT.FCSKID', '=', 'GLREF.FCTOWHOUSE')
+            ->join('SECT as S', function ($join) {
+                $join->on('S.FCSKID', '=', 'GLREF.FCSECT')
+                    ->on('S.FCDEPT', '=', 'GLREF.FCDEPT');
+            })
+            ->join('FORMULA.dbo.REFPROD as R', 'R.FCGLREF', '=', 'GLREF.FCSKID')
+            ->join('FORMULA.dbo.PROD as P', 'P.FCSKID', '=', 'R.FCPROD')
+            ->join('FORMULA.dbo.PDGRP as PD', 'P.FCPDGRP', '=', 'PD.FCSKID')
+            ->join('FORMULA.dbo.UM as U', 'U.FCSKID', '=', 'R.FCUM')
+            ->where('GLREF.FCSKID', $glref_fcskid)
+            ->where('R.FCIOTYPE', 'I')
+            ->where('R.FCSTAT', '<>', 'C');
+            // ->where('P.FCTYPE', '1');
     }
 }
