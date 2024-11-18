@@ -117,7 +117,7 @@ class Detail extends Page implements HasTable
                     ->url(fn(Fccode_Glref $record): string => TransferBookMenuResource::getUrl(
                         'detail_print',
                         [
-                            'record' => $this->id . '@' .
+                            'record' => $this->id . '@' . $record->DOC_NO . '@' .
                                 str_replace('/', '-', $record->REF_NO)
                         ]
                     ))

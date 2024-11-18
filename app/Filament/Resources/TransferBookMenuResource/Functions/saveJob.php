@@ -78,4 +78,37 @@ class saveJob
             ]);
         }
     }
+
+    public static function saveJobToTag_No_Kanban($job_id, $from_whs, $to_whs, $whouse, $user_id, $created_date, $data)
+    {
+        foreach ($data as $item) {
+            $setupTag = SetupTag::where('FCCODE', $item['PART_NO'])->first();
+            if ($setupTag && $setupTag->image) {
+                $item['image'] = asset('storage/' . $setupTag->image);
+            } else {
+                $item['image'] = asset('storage/image_part/error.jpg');
+            }
+
+            // dd($item);
+            $jobToTag = JobToTag::create([
+                'image' => $item['image'],
+                'part_no' => $item['PART_NO'],
+                'part_code' => $item['PART_CODE'],
+                'part_name' => $item['PART_NAME'],
+                'model' => $item['MODEL'],
+                'qty' => (int)$item['QTY'],
+                'packing_name' => $item['UNIT'],
+                'whouse' => $whouse,
+                'from_whs' => $from_whs,
+                'to_whs' => $to_whs,
+                'status' => 0,
+                'job_id' => $job_id,
+                'created_date' => $created_date,
+                'user_id' => $user_id,
+            ]);
+            $qr_code = $jobToTag->part_no . '@' . $jobToTag->qty . '@' . $jobToTag->packing_name . '@' . $jobToTag->whouse . '@' . $jobToTag->id;
+            $jobToTag->qr_code = $qr_code;
+            $jobToTag->save();
+        }
+    }
 }
