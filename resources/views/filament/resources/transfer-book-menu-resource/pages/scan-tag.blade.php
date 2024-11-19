@@ -91,6 +91,7 @@
                         <thead
                             class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                             <tr>
+                                <th class="px-4 py-3">ID</th>
                                 <th class="px-4 py-3">Qr Code</th>
                                 <th class="px-4 py-3">Part No</th>
                                 <th class="px-4 py-3">Part Code</th>
@@ -107,6 +108,10 @@
                             @forelse ($tags as $index => $part)
                                 <tr class="{{ $index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800' }} border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150"
                                     id="tr_{{ $index }}" name="tr_{{ $index }}">
+                                    <td class="px-4 py-3" id="id_{{ $index }}"
+                                        name="id_{{ $index }}">
+                                        {{ $part['id'] }}
+                                    </td>
                                     <td class="px-4 py-3" id="qr_code_{{ $index }}"
                                         name="qr_code_{{ $index }}">
                                         {{ $part['qr_code'] }}
@@ -127,7 +132,8 @@
                                         name="model_{{ $index }}">
                                         {{ $part['model'] }}
                                     </td>
-                                    <td class="px-4 py-3" id="qty_{{ $index }}" name="qty_{{ $index }}">
+                                    <td class="px-4 py-3" id="qty_{{ $index }}"
+                                        name="qty_{{ $index }}">
                                         {{ $part['qty'] }}
                                     </td>
                                     <td class="px-4 py-3" id="packing_name_{{ $index }}"
@@ -149,7 +155,7 @@
                                 </tr>
                             @empty
                                 <tr style="height: 250px">
-                                    <td colspan="10" class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
+                                    <td colspan="11" class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
                                         No data available
                                     </td>
                                 </tr>
