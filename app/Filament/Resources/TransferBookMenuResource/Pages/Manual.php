@@ -4,9 +4,11 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
 use App\Models\FormulaStockProd;
+use App\Models\Sect;
 use App\Models\SetupTag;
 use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
+use Filament\Tables\Columns\TextInputColumn;
 use Illuminate\Support\Facades\Route;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -37,11 +39,18 @@ class Manual extends Page implements HasTable
     public $cpart_no = "Hello World!"; // ตัวแปรที่จะเก็บค่า CPART_NO ที่เลือก
     public $part_selected;
     public $packing;
+    public $book;
+    public $sections;
+    public $user;
 
     public function mount()
     {
         $this->id = Route::current()->parameter('record'); // Get the ID from the route parameters
         $this->part_selected = [];
+        $this->book = TransferBook::where('id', $this->id)->get()->first()->book;
+        $this->sections = Sect::all()->toArray();
+        $this->user = Auth::user();
+        // dd($this->sections);
     }
 
     protected function getActions(): array
@@ -81,12 +90,13 @@ class Manual extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
+            ->paginated(false)
             ->query(
                 // FormulaStockProd::query()
-                //     ->selectRaw('TOP 100 FCSKID, FCCODE, FCSNAME, FCNAME')
+                //     ->selectRaw('TOP 10 FCSKID, FCCODE, FCSNAME, FCNAME')
                 fn() => (
                     // dd(FormulaStockProd::getProduct('1', '5T')->get())
-                    FormulaStockProd::getProduct($this->fc_type, $this->cpart_no ?? "")
+                    FormulaStockProd::getProduct($this->fc_type, $this->cpart_no ?? "")->limit(10)
                 )
             )
             ->columns([
@@ -114,6 +124,10 @@ class Manual extends Page implements HasTable
                     ->label('Stock Qty')
                     ->numeric()
                     ->sortable(),
+                // TextInputColumn::make('QTY')
+                //     ->label('Qty')
+                //     ->type('integer')
+                //     ->getStateUsing(fn ($record) => 0) // กำหนดค่าเริ่มต้น
             ])
             ->filters([
                 // Add filters if needed
@@ -177,7 +191,7 @@ class Manual extends Page implements HasTable
         $notification->send();
     }
 
-    public function handleConfirmSave($data)
+    public function handleConfirmSave($data, $section)
     {
         // dd($data);
         foreach ($data as $item) {

@@ -101,8 +101,10 @@ class WrDetail extends Page implements HasTable
                     ->label('Part Name')
                     ->sortable(),
                 TextColumn::make('STARTDATE')->date('Y-m-d')
+                    ->label('Start Date')
                     ->sortable(),
                 TextColumn::make('ENDDATE')->date('Y-m-d')
+                    ->label('End Date')
                     ->sortable(),
             ])
             ->filters([

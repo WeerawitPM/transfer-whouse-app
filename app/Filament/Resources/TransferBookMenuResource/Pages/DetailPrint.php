@@ -4,7 +4,6 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 
 use App\Filament\Resources\TransferBookMenuResource;
 use App\Filament\Resources\TransferBookMenuResource\Functions\printDocument;
-use App\Filament\Resources\TransferBookMenuResource\Functions\printTag;
 use App\Models\Fccode_Glref;
 use App\Models\JobHead;
 use Filament\Resources\Pages\Page;
@@ -13,7 +12,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Illuminate\Support\Facades\Route;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
 use Filament\Pages\Actions\ButtonAction;
 use App\Models\TransferBook;
 use Filament\Notifications\Notification;
