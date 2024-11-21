@@ -186,8 +186,8 @@ class ScanTag_old extends Page implements HasTable
         $user = Auth::user();
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
         $remark = "Scan";
-        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark);
-        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark);
+        // handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark);
+        // handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark);
         // handleJob::handleUpdateJobHead($job_id);
         handleJob::handleUpdateJobToTag($jobToTag);
         // handleJob::handleUpdateJobDetail($jobDetail);

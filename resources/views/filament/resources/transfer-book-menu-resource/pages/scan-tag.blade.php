@@ -1,72 +1,8 @@
 <x-filament-panels::page>
-    <x-filament::section collapsible>
-        <x-slot name="heading">
-            Book details
-        </x-slot>
-        {{-- Content --}}
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-200 text-xs font-bold mb-2">
-                    Book Name
-                </label>
-                <input class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-                    type="text" value="{{ $book['FCCODE'] }}" readonly>
-            </div>
-            <div class="w-full md:w-1/2 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-200 text-xs font-bold mb-2">
-                    Book Prefix
-                </label>
-                <input class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-                    type="text" value="{{ $book['FCPREFIX'] }}" readonly>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-200 text-xs font-bold mb-2">
-                    From whouse
-                </label>
-                <input
-                    class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-                    type="text" value="{{ $book['from_whs']['FCCODE'] }}" readonly>
-            </div>
-            <div class="w-full md:w-1/2 px-3">
-                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-200 text-xs font-bold mb-2">
-                    To whouse
-                </label>
-                <input
-                    class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-                    type="text" value="{{ $book['to_whs']['FCCODE'] }}" readonly>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap -mx-3 mb-6">
-            <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-                <label class="block uppercase tracking-wide text-gray-700 dark:text-gray-200 text-xs font-bold mb-2">
-                    Section
-                </label>
-                <x-filament::input.wrapper>
-                    <x-filament::input.select wire:model="status" name="secion" id="section">
-                        @foreach ($sections as $section)
-                            @if ($section['FCSKID'] == $user->sect->FCSKID)
-                                <option value="{{ $section['FCSKID'] }}" selected>
-                                    {{ $section['FCNAME'] }}
-                                    {{-- {{ $section['FCCODE'] }} - {{ $section['FCNAME'] }} --}}
-                                </option>
-                            @endif
-                            <option value="{{ $section['FCSKID'] }}">
-                                {{ $section['FCNAME'] }}
-                                {{-- {{ $section['FCCODE'] }} - {{ $section['FCNAME'] }} --}}
-                            </option>
-                        @endforeach
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
-            </div>
-        </div>
-    </x-filament::section>
+    @include('filament.resources.transfer-book-menu-resource.components.book-head')
     {{ $this->form }}
     <div x-data="{ activeTab: 'tab1' }">
-        <x-filament::tabs label="Content tabs" class="justify-start w-[180px]">
+        <x-filament::tabs label="Content tabs" class="justify-start w-[165px]">
             <x-filament::tabs.item alpine-active="activeTab === 'tab1'" x-on:click="activeTab = 'tab1'">
                 Tags
             </x-filament::tabs.item>
@@ -173,8 +109,7 @@
                             @forelse ($tags as $index => $part)
                                 <tr class="{{ $index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800' }} border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150"
                                     id="tr_{{ $index }}" name="tr_{{ $index }}">
-                                    <td class="px-4 py-3" id="id_{{ $index }}"
-                                        name="id_{{ $index }}">
+                                    <td class="px-4 py-3" id="id_{{ $index }}" name="id_{{ $index }}">
                                         {{ $part['id'] }}
                                     </td>
                                     <td class="px-4 py-3" id="qr_code_{{ $index }}"
@@ -233,36 +168,4 @@
     </div>
 </x-filament-panels::page>
 
-<script>
-    const section = document.getElementById('section');
-    section.addEventListener('change', function() {
-        // console.log(section.value);
-        @this.handleUpdateSection(section.value);
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const inputQrCode = document.getElementById('input_qr_code');
-
-        if (inputQrCode) {
-            inputQrCode.focus();
-            inputQrCode.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    // console.log(section.value);
-                    event.preventDefault();
-                    @this.handleQrCodeInput(inputQrCode.value);
-                    inputQrCode.value = '';
-                    inputQrCode.focus();
-                }
-            });
-
-            inputQrCode.addEventListener('keydown', function(event) {
-                if (event.keyCode == 9) { //tab pressed
-                    event.preventDefault();
-                    @this.handleQrCodeInput(inputQrCode.value);
-                    inputQrCode.value = '';
-                    inputQrCode.focus();
-                }
-            });
-        }
-    });
-</script>
+@include('filament.resources.transfer-book-menu-resource.scripts.scan-tag')
