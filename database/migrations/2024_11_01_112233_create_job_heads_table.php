@@ -26,6 +26,7 @@ return new class extends Migration {
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
+            $table->string('job_master')->nullable();
         });
     }
 

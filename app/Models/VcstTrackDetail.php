@@ -32,7 +32,8 @@ class VcstTrackDetail extends Model
                 LTRIM(RTRIM(P.FCNAME)) AS FCNAME,
                 LTRIM(RTRIM(K.CMODEL)) AS CMODEL,
                 LTRIM(RTRIM(K.CPACK)) AS CPACK,
-                LTRIM(RTRIM(K.CPICTURE)) AS CPICTURE
+                LTRIM(RTRIM(K.CPICTURE)) AS CPICTURE,
+                K.NQTY AS QTY
             ')
             ->join('FORMULA.dbo.PROD AS P', function ($join) {
                 $join->on(DB::raw('LTRIM(RTRIM(TRACK.CPART_NO))'), '=', DB::raw('LTRIM(RTRIM(P.FCCODE))'));

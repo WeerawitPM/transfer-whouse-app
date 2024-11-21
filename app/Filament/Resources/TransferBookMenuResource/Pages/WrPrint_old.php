@@ -6,26 +6,22 @@ use App\Filament\Resources\TransferBookMenuResource;
 use App\Filament\Resources\TransferBookMenuResource\Functions\printDocument;
 use App\Filament\Resources\TransferBookMenuResource\Functions\printTag;
 use App\Filament\Resources\TransferBookMenuResource\Functions\saveJob;
-use App\Models\JobToTag;
 use App\Models\SetupTag;
 use App\Models\VcstTrackDetail;
 use App\Models\JobHead;
 use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Route;
 use Filament\Pages\Actions\ButtonAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Notifications\Notification;
 use Auth;
-use Filament\Tables\Columns\Summarizers\Count;
 
-class WrPrint extends Page implements HasTable
+class WrPrint_old extends Page implements HasTable
 {
     use InteractsWithTable;
     protected static string $resource = TransferBookMenuResource::class;
@@ -63,15 +59,43 @@ class WrPrint extends Page implements HasTable
         // ]);
     }
 
+    protected function getActions(): array
+    {
+        $job_head = JobHead::query()->where('job_no', $this->job_no)->first();
+        if ($job_head) {
+            return [
+                ButtonAction::make('print_document')
+                    ->label('Print Document')
+                    ->color('primary')
+                    ->icon('heroicon-o-printer')
+                    ->action(fn() => printDocument::print_document_one($job_head->job_no)),
+                ButtonAction::make('print_tag')
+                    ->label('Print Tag')
+                    ->color('primary')
+                    ->icon('heroicon-o-printer')
+                    ->action(fn() => printTag::print_tags_one($job_head->job_no)),
+            ];
+        } else {
+            return [
+                ButtonAction::make('generate_document')
+                    ->label('Generate Document')
+                    ->color('primary')
+                    ->icon('heroicon-o-printer')
+                    // ->action(function () {
+                    //     $this->generate_document();
+                    // })
+                    ->extraAttributes([
+                        'id' => 'generate_document',
+                        'onclick' => 'disableButton()',
+                    ])
+            ];
+        }
+    }
+
     protected function getTableData()
     {
         if ($this->job_no && $this->part_no) {
-            // ดึง KANBAN ทั้งหมดใน JobToTag
-            $excludedKanbans = JobToTag::pluck('kanban')->toArray();
-
-            // กรองข้อมูลที่ไม่ตรงกับ KANBAN ใน JobToTag
-            return VcstTrackDetail::getTrackDetail($this->job_no, $this->part_no)
-                ->whereNotIn('KANBAN', $excludedKanbans);
+            return VcstTrackDetail::getTrackDetail($this->job_no, $this->part_no);
         }
 
         return VcstTrackDetail::getTrackDetail('Hello World', 'Hello World');
@@ -113,9 +137,12 @@ class WrPrint extends Page implements HasTable
                 TextColumn::make('CPACK')
                     ->label('Package Name')
                     ->sortable(),
-                TextColumn::make('QTY')
+                TextColumn::make('qty')
                     ->label('Quantity')
-                    ->summarize(Count::make()),
+                    ->getStateUsing(function ($record) {
+                        $data = explode(',', $record->KANBAN);
+                        return isset($data[1]) ? $data[1] : 'N/A';
+                    }),
             ])
             ->filters([
                 // ...
@@ -124,18 +151,13 @@ class WrPrint extends Page implements HasTable
                 //
             ])
             ->bulkActions([
-                BulkAction::make('print')
-                    // ->requiresConfirmation()
-                    ->label('Print')
-                    ->action(fn(Collection $records) => $this->submit($records))
-                    ->icon('heroicon-o-printer')
+                // ...
             ])
             ->striped();
     }
 
-    public function submit($records)
+    public function generate_document()
     {
-        // dd($records->toArray());
         $from_whs_get = TransferBook::query()
             ->where('id', $this->transfer_book_id)
             ->with('book.from_whs')
@@ -148,8 +170,6 @@ class WrPrint extends Page implements HasTable
             ->first();
         $to_whs = $to_whs_get->book->to_whs->FCCODE ?? null;
 
-        $book = TransferBook::where('id', $this->transfer_book_id)->get()->first()->book;
-
         $whouse = '';
         if ($to_whs == 'XXX') {
             $whouse = '005';
@@ -159,21 +179,11 @@ class WrPrint extends Page implements HasTable
         $department = Auth::user()->dept->FCNAME;
         $created_date = date('Y-m-d');
 
-        // สร้าง job_no
-        $yearMonth = date('Ym'); // ปีและเดือนปัจจุบัน
-        $lastJob = JobHead::where('job_no', 'like', "JB{$yearMonth}/%")
-            ->orderBy('id', 'desc')
-            ->first();
-
-        $lastRunNumber = $lastJob ? intval(explode('/', $lastJob->job_no)[1]) : 0;
-        $newRunNumber = $lastRunNumber + 1;
-        $job_no = sprintf('JB%s/%d', $yearMonth, $newRunNumber);
-
-        $jobHead = JobHead::Create(
+        $jobHead = JobHead::firstOrCreate(
+            ['job_no' => $this->job_no],
             [
-                'job_no' => $job_no,
-                'doc_no' => $yearMonth . $newRunNumber,
-                'doc_ref_no' => $book['FCPREFIX'] . $yearMonth . $newRunNumber,
+                'doc_no' => $this->job_no,
+                'doc_ref_no' => $this->job_no,
                 'department' => $department,
                 'from_whs' => $from_whs,
                 'to_whs' => $to_whs,
@@ -184,7 +194,8 @@ class WrPrint extends Page implements HasTable
         );
         $jobHead->save();
 
-        saveJob::saveJobToTag($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date, $records->toArray());
+        $data = $this->getTableRecords()->toArray();
+        saveJob::saveJobToTag($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date, $data);
         saveJob::saveJobDetail($jobHead->id, $from_whs, $to_whs, $whouse, $user_id, $created_date);
 
         Notification::make()
@@ -193,44 +204,8 @@ class WrPrint extends Page implements HasTable
             ->send();
 
         $url = $this->getUrl([$this->id]);
-        return $this->print($job_no);
-        // return redirect($url);
-    }
+        // dd($url);
 
-    public function print($job_no)
-    {
-        // dd($job_no);
-        $zip = new \ZipArchive();
-        $zipFileName = storage_path('app/public/documents.zip');
-        $pdfFiles = [];  // เก็บ paths ของไฟล์ PDF ที่สร้างขึ้น
-
-        if ($zip->open($zipFileName, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
-            // รับ path ของไฟล์ PDF ที่สร้างขึ้นจาก printDocument
-            $documentPath = printDocument::print_document($job_no);
-            if ($documentPath) {
-                $zip->addFile($documentPath, basename($documentPath));
-                $pdfFiles[] = $documentPath; // เก็บ path ของไฟล์ PDF ไว้สำหรับลบภายหลัง
-            }
-
-            // รับ path ของไฟล์ PDF ที่สร้างขึ้นจาก printTag
-            $tagPath = printTag::print_tags($job_no);
-            if ($tagPath) {
-                $zip->addFile($tagPath, basename($tagPath));
-                $pdfFiles[] = $tagPath; // เก็บ path ของไฟล์ PDF ไว้สำหรับลบภายหลัง
-            }
-            $zip->close();
-        } else {
-            return response()->json(['error' => 'Failed to create zip file.'], 500);
-        }
-
-        // ลบไฟล์ PDF ที่เก็บไว้หลังจาก ZIP เสร็จสิ้น
-        foreach ($pdfFiles as $pdfFile) {
-            if (file_exists($pdfFile)) {
-                unlink($pdfFile);
-            }
-        }
-
-        // ดาวน์โหลด ZIP ไฟล์
-        return response()->download($zipFileName)->deleteFileAfterSend(true);
+        return redirect($url);
     }
 }

@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route; // Import Route facade
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
 
-class WrDetail extends Page implements HasTable
+class WrDetail_old extends Page implements HasTable
 {
     use InteractsWithTable;
     protected static string $resource = TransferBookMenuResource::class;
@@ -67,8 +67,8 @@ class WrDetail extends Page implements HasTable
 
         // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
         if ($this->startDate && $this->endDate) {
-            return VcstTrack::getTrack($this->startDate, $this->endDate);
-                // ->whereNotIn('JOB_NO', $jobNosInJobHead);
+            return VcstTrack::getTrack($this->startDate, $this->endDate)
+                ->whereNotIn('JOB_NO', $jobNosInJobHead);
             ;
         }
 
