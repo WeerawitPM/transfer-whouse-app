@@ -180,6 +180,7 @@ class WrPrint extends Page implements HasTable
                 'status' => 0,
                 'created_date' => $created_date,
                 'user_id' => $user_id,
+                'job_master' => $this->job_no,
             ]
         );
         $jobHead->save();

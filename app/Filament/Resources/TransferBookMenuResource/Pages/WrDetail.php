@@ -7,7 +7,9 @@ use App\Filament\Resources\TransferBookMenuResource;
 use App\Filament\Resources\TransferBookMenuResource\Functions\printDocument;
 use App\Filament\Resources\TransferBookMenuResource\Functions\printTag;
 use App\Filament\Resources\TransferBookMenuResource\Functions\saveJob;
+use App\Models\JobDetail;
 use App\Models\JobHead;
+use App\Models\JobToTag;
 use App\Models\TransferBook;
 use App\Models\VcstTrack;
 use App\Models\VcstTrackDetail;
@@ -62,17 +64,37 @@ class WrDetail extends Page implements HasTable
 
     protected function getTableData()
     {
-        // ดึง `job_no` ทั้งหมดจาก `JobHead`
-        $jobNosInJobHead = JobHead::all()->pluck('job_no')->toArray();
+        $jobDetails = JobDetail::with('job_head')->get()
+            ->groupBy(function ($jobDetail) {
+                return $jobDetail->job_head->job_master; // จัดกลุ่มตาม job_master
+            })
+            ->map(function ($groupedDetails) {
+                // คำนวณยอดรวม qty ของ job_master โดยรวมทุก part_no
+                return $groupedDetails->sum('qty');
+            })
+            ->toArray();
+        // dd($jobDetails);
 
-        // If start and end dates are set, filter the query; otherwise, return an empty collection or a default query.
         if ($this->startDate && $this->endDate) {
-            return VcstTrack::getTrack($this->startDate, $this->endDate);
-                // ->whereNotIn('JOB_NO', $jobNosInJobHead);
-            ;
+            // ตรวจสอบข้อมูล
+            $track = VcstTrack::getTrack($this->startDate, $this->endDate)->get()->toArray();
+            $jobNosInJobHead = [];
+            foreach ($jobDetails as $jobMaster => $record) {
+                $filteredTrack = array_filter($track, function ($item) use ($jobMaster) {
+                    return $item['JOB_NO'] === $jobMaster; // กรองเฉพาะ JOB_NO ที่ตรง
+                });
+
+                $trackQty = $filteredTrack ? reset($filteredTrack)['QTY'] : null; // ดึงค่า QTY ของรายการแรก (ถ้ามี)
+                if ((int) $record === (int) $trackQty) {
+                    $jobNosInJobHead[] = $jobMaster;
+                }
+            }
+            // dd($jobNosInJobHead);
+
+            return VcstTrack::getTrack($this->startDate, $this->endDate)
+                ->whereNotIn('JOB_NO', $jobNosInJobHead);
         }
 
-        // // return VcstTrack::getTrack('2024-10-29', '2024-10-31');
         return VcstTrack::query()
             //return null
             ->where('JOB_NO', 'Hello World');
@@ -106,6 +128,9 @@ class WrDetail extends Page implements HasTable
                 TextColumn::make('ENDDATE')->date('Y-m-d')
                     ->label('End Date')
                     ->sortable(),
+                TextColumn::make('QTY')
+                    ->label('Qty')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 // ...
@@ -125,9 +150,9 @@ class WrDetail extends Page implements HasTable
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                BulkAction::make('print')
-                    // ->requiresConfirmation()
-                    ->action(fn(Collection $records) => $this->print($records))
+                // BulkAction::make('print')
+                //     // ->requiresConfirmation()
+                //     ->action(fn(Collection $records) => $this->print($records))
             ]);
     }
 
