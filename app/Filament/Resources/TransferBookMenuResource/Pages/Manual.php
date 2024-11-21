@@ -193,7 +193,7 @@ class Manual extends Page implements HasTable
 
     public function handleConfirmSave($data, $section)
     {
-        // dd($data);
+        // dd($data, $section);
         foreach ($data as $item) {
             // ค้นหาข้อมูลตาม FCSKID
             $setupTag = SetupTag::where('FCSKID', $item['FCSKID'])->first();
@@ -222,7 +222,7 @@ class Manual extends Page implements HasTable
         $user = Auth::user();
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
         $remark = "Manual";
-        handleSaveProduct::handleSaveProduct($data, $book, $user, $remark);
+        handleSaveProduct::handleSaveProduct($data, $book, $user, $remark, $section);
         // handleSaveWrProduct::handleSaveWrProduct($data, $user, $remark);
 
         $this->handleNotification("แจ้งเตือน", "บันทึกข้อมูลสำเร็จ", "success");

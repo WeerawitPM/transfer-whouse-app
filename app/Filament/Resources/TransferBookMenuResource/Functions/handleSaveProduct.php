@@ -6,16 +6,18 @@ use App\Models\Fccode_Glref;
 use App\Models\Glref;
 use App\Models\RefProd;
 use App\Models\RefType;
+use App\Models\Sect;
 use Illuminate\Support\Facades\DB;
 
 class handleSaveProduct
 {
-    public static function handleSaveProduct($jobDetail, $book, $user, $remark)
+    public static function handleSaveProduct($jobDetail, $book, $user, $remark, $section)
     {
         $book_fcskid = $book->FCSKID;
         $current_year = now()->year;
         $current_month = now()->format("m");
         $current_date = now()->toDateString();
+        $department = Sect::where("FCSKID", $section)->get()->first()->toArray();
 
         $FCCODE_GLREF = Fccode_Glref::get_frcode_glref_store($book_fcskid, $current_year, $current_month);
         // dd($FCCODE_GLREF);
@@ -23,8 +25,8 @@ class handleSaveProduct
         $FCRFTYPE = RefType::where("FCSKID", $book->FCREFTYPE)->pluck("FCRFTYPE")->first();
         // dd($FCRFTYPE);
         $FCREFTYPE = $book->FCREFTYPE;
-        $FCDEPT = $user->dept->FCSKID;
-        $FCSECT = $user->sect->FCSKID;
+        $FCDEPT = $department["FCDEPT"];
+        $FCSECT = $section;
         $FDDATE = $current_date;
         $FCBOOK = $book_fcskid;
         $FCCODE = $FCCODE_GLREF;

@@ -8,25 +8,27 @@ use App\Models\FormulaFormulas;
 use App\Models\Glref;
 use App\Models\RefProd;
 use App\Models\RefType;
+use App\Models\Sect;
 use Illuminate\Support\Facades\DB;
 
 class handleSaveWrProduct
 {
-    public static function handleSaveWrProduct($jobDetail, $user, $remark)
+    public static function handleSaveWrProduct($jobDetail, $user, $remark, $section)
     {
         $book = Book::where('FCREFTYPE', 'WR')->where('FCCODE', '0001')->get()->first();
         $book_fcskid = $book->FCSKID;
         $current_year = now()->year;
         $current_month = now()->format("m");
         $current_date = now()->toDateString();
+        $department = Sect::where("FCSKID", $section)->get()->first()->toArray();
 
         $FCCODE_GLREF = Fccode_Glref::get_frcode_glref_store($book_fcskid, $current_year, $current_month);
         // dd($FCCODE_GLREF);
 
         $FCRFTYPE = RefType::where("FCSKID", $book->FCREFTYPE)->pluck("FCRFTYPE")->first();
         $FCREFTYPE = $book->FCREFTYPE;
-        $FCDEPT = $user->dept->FCSKID;
-        $FCSECT = $user->sect->FCSKID;
+        $FCDEPT = $department["FCDEPT"];
+        $FCSECT = $section;
         $FDDATE = $current_date;
         $FCBOOK = $book_fcskid;
         $FCCODE = $FCCODE_GLREF;

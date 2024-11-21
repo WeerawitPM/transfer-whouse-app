@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TransferBookMenuResource\Pages;
 use App\Filament\Resources\TransferBookMenuResource;
 use App\Filament\Resources\TransferBookMenuResource\Functions\handleJob;
 use App\Models\JobToTag;
+use App\Models\Sect;
 use App\Models\TransferBook;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,10 @@ class ScanTag extends Page
     public $input_qr_code;
     public $tags;
     public $tags_detail;
+    public $book;
+    public $sections;
+    public $user;
+    public $section;
 
     public function mount()
     {
@@ -32,6 +37,11 @@ class ScanTag extends Page
         $this->input_qr_code = ''; // Initialize input_qr_code
         $this->tags = [];
         $this->tags_detail = [];
+        $this->book = TransferBook::where('id', $this->id)->get()->first()->book;
+        $this->sections = Sect::all()->toArray();
+        $this->user = Auth::user();
+        $this->section = $this->user->sect->FCSKID;
+        // dd($this->section);
     }
 
     protected function getActions(): array
@@ -137,6 +147,7 @@ class ScanTag extends Page
 
     public function handleSave()
     {
+        // dd($this->section);
         $jobToTag = $this->tags;
         $jobDetail = $this->tags_detail;
 
@@ -152,8 +163,8 @@ class ScanTag extends Page
         $user = Auth::user();
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
         $remark = "Scan";
-        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark);
-        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark);
+        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark, $this->section);
+        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark, $this->section);
         // handleJob::handleUpdateJobHead($job_id);
         handleJob::handleUpdateJobToTag($jobToTag);
         // handleJob::handleUpdateJobDetail($jobDetail);
@@ -211,5 +222,11 @@ class ScanTag extends Page
                 ->color('success')
                 ->send();
         }
+    }
+
+    public function handleUpdateSection($state)
+    {
+        $this->section = $state;
+        // dd($this->section);
     }
 }
