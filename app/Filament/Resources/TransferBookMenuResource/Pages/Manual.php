@@ -9,6 +9,7 @@ use App\Models\SetupTag;
 use App\Models\TransferBook;
 use Filament\Forms\Components\Grid;
 use Filament\Resources\Pages\Page;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextInputColumn;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -149,7 +150,27 @@ class Manual extends Page implements HasTable
                 // Add filters if needed
             ])
             ->actions([
-                // Define row actions if needed
+                Action::make('Add')
+                    ->button()
+                    ->action(function ($record) {
+                        // ตรวจสอบ stockqty ห้ามน้อยกว่าหรือ = 0
+                        if ($record->STOCKQTY <= 0) {
+                            $this->handleNotification('เกิดข้อผิดพลาด', 'ห้ามเลือกรายการที่ stockqty เป็น 0', 'danger');
+                            return;
+                        }
+
+                        // ตรวจสอบและแจ้งเตือนในกรณีที่เลือกข้อมูลเดิม
+                        if (collect($this->part_selected)->contains('FCSKID', $record->FCSKID)) {
+                            $this->handleNotification('เกิดข้อผิดพลาด', 'ข้อมูลนี้มีอยู่ในตารางแล้ว', 'warning');
+                            return;
+                        }
+
+                        // เพิ่มข้อมูลลงใน part_selected
+                        $this->part_selected[] = $record->toArray();
+                        $this->handleNotification('สำเร็จ', 'เพิ่มข้อมูลเรียบร้อยแล้ว', 'success');
+                    })
+                    ->icon('heroicon-o-plus') // ไอคอนของปุ่ม
+                    ->color('primary') // สีของปุ่ม
             ])
             ->bulkActions([
                 BulkAction::make('Add')
@@ -175,6 +196,7 @@ class Manual extends Page implements HasTable
 
                         // บันทึกข้อมูลลง part_selected
                         $this->part_selected = array_merge($this->part_selected, $newRecords->toArray());
+                        $this->handleNotification('สำเร็จ', 'เพิ่มข้อมูลเรียบร้อยแล้ว', 'success');
                     })
                     ->deselectRecordsAfterCompletion()
             ])
@@ -209,7 +231,7 @@ class Manual extends Page implements HasTable
 
     public function handleConfirmSave($data, $section)
     {
-        dd($data, $section);
+        // dd($data, $section);
         foreach ($data as $item) {
             // ค้นหาข้อมูลตาม FCSKID
             $setupTag = SetupTag::where('FCSKID', $item['FCSKID'])->first();
