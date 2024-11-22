@@ -1,11 +1,12 @@
 <script>
     const inputSearchPart = document.getElementById('input_search_part');
+    const product_type = document.getElementById('product_type');
     const partData = [];
 
     inputSearchPart.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
-            @this.handleSearchPart(inputSearchPart.value);
+            @this.handleSearchPart(inputSearchPart.value, product_type.value);
             // inputSearchPart.value = '';
         }
     });

@@ -2,11 +2,13 @@
     @include('filament.resources.transfer-book-menu-resource.components.book-head')
     <!-- Table in Modal -->
     <x-filament::modal width="5xl" :close-by-clicking-away="false">
-        <x-slot name="trigger" style="width: 105px">
-            <x-filament::button>
-                Search Part
-            </x-filament::button>
-        </x-slot>
+        <div class="flex justify-center w-full">
+            <x-slot name="trigger" class="mx-auto" style="width: 105px">
+                <x-filament::button>
+                    Search Part
+                </x-filament::button>
+            </x-slot>
+        </div>
         <x-slot name="heading">
             Search Part
         </x-slot>
@@ -15,14 +17,14 @@
             <div>
                 {{ $this->form }}
             </div>
-            <div class="mt-2">
+            <div class="mt-3">
                 {{ $this->table }}
             </div>
         </div>
     </x-filament::modal>
 
     <!-- Table -->
-    <div class="mt-4 overflow-x-auto border dark:border-none rounded-lg">
+    <div class="mt-2 overflow-x-auto border dark:border-none rounded-lg">
         <table id="partsTable" class="w-full table-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
             <thead
                 class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
@@ -66,13 +68,13 @@
                         </td>
                         <td class="px-4 py-3">
                             <input type="number" min="0" required wire:ignore
-                                class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-0"
+                                class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-gray-200 dark:border-0"
                                 id="packing_qty_{{ $index }}" name="packing_qty_{{ $index }}"
                                 style="width: 100px" value="{{ $packing[$part['FCSKID']]->packing_qty ?? 0 }}">
                         </td>
                         <td class="px-4 py-3">
                             <input type="number" min="0" required wire:ignore
-                                class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-0"
+                                class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-gray-200 dark:border-0"
                                 id="qty_{{ $index }}" name="qty_{{ $index }}" style="width: 100px"
                                 value="0">
                         </td>
@@ -106,8 +108,7 @@
                 @click="$dispatch('close-modal', {id: 'confirmSaveModal'})">
                 ยกเลิก
             </x-filament::button>
-            <x-filament::button type="button" color="primary"
-                onclick="confirmSaveModal()">ยืนยัน</x-filament::button>
+            <x-filament::button type="button" color="primary" onclick="confirmSaveModal()">ยืนยัน</x-filament::button>
         </div>
     </x-filament::modal>
 </x-filament-panels::page>

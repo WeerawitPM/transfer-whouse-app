@@ -7,8 +7,10 @@ use App\Models\FormulaStockProd;
 use App\Models\Sect;
 use App\Models\SetupTag;
 use App\Models\TransferBook;
+use Filament\Forms\Components\Grid;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\TextInputColumn;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -22,6 +24,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Auth;
 use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveProduct;
 use App\Filament\Resources\TransferBookMenuResource\Functions\handleSaveWrProduct;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Set;
+use Filament\Forms\Get;
 
 class Manual extends Page implements HasTable
 {
@@ -35,7 +40,7 @@ class Manual extends Page implements HasTable
 
 
     public $id;
-    public $fc_type = "1";
+    public $fc_type;
     public $cpart_no = "Hello World!"; // ตัวแปรที่จะเก็บค่า CPART_NO ที่เลือก
     public $part_selected;
     public $packing;
@@ -50,6 +55,7 @@ class Manual extends Page implements HasTable
         $this->book = TransferBook::where('id', $this->id)->get()->first()->book;
         $this->sections = Sect::all()->toArray();
         $this->user = Auth::user();
+        $this->fc_type = "";
         // dd($this->sections);
     }
 
@@ -72,16 +78,30 @@ class Manual extends Page implements HasTable
 
     protected function getFormSchema(): array
     {
+        $product_type = DB::connection('formula')->table('PRODTYPE')
+            ->selectRaw('FCCODE, LTRIM(RTRIM(FCNAME)) AS FCNAME')
+            ->get()
+            ->pluck('FCNAME', 'FCCODE') // แปลงข้อมูลเป็น ['FCCODE' => 'FCNAME']
+            ->toArray(); // แปลงเป็น array
+        // dd($product_type);
         return [
-            TextInput::make('input_search_part')
-                ->label('Search')
-                ->suffixIcon('heroicon-m-magnifying-glass')
+            Grid::make(2) // แบ่งฟอร์มออกเป็น 2 คอลัมน์
+                ->schema([
+                    Select::make('product_type')
+                        ->label('Product Type')
+                        ->options($product_type) // ใส่ข้อมูลที่แปลงแล้วใน options
+                        ->placeholder('Select a product type'),
+                    TextInput::make('input_search_part')
+                        ->label('Search')
+                        ->suffixIcon('heroicon-m-magnifying-glass'),
+                ]),
         ];
     }
 
-    public function handleSearchPart($state)
+    public function handleSearchPart($state, $product_type)
     {
         $this->cpart_no = $state;
+        $this->fc_type = $product_type;
         $this->resetTable();
         $this->packing = SetupTag::all()->keyBy('FCSKID'); // สร้างคีย์ตาม FCSKID
     }
@@ -101,29 +121,25 @@ class Manual extends Page implements HasTable
             )
             ->columns([
                 TextColumn::make('FCSKID')
-                    ->sortable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('CPART_NO')
                     ->label('Part No')
-                    ->sortable()
                     ->searchable(
                         "PROD.FCCODE"
                     ),
                 TextColumn::make('CCODE')
-                    ->label('Part Code')
-                    ->sortable(),
+                    ->label('Part Code'),
                 TextColumn::make('CPART_NAME')
-                    ->label('Part Name')
-                    ->sortable(),
+                    ->label('Part Name'),
                 TextColumn::make('MODEL')
                     ->label('Model')
-                    ->sortable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('SMODEL')
                     ->label('SModel')
-                    ->sortable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('STOCKQTY')
                     ->label('Stock Qty')
-                    ->numeric()
-                    ->sortable(),
+                    ->numeric(),
                 // TextInputColumn::make('QTY')
                 //     ->label('Qty')
                 //     ->type('integer')
