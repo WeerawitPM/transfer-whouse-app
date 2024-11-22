@@ -209,7 +209,7 @@ class Manual extends Page implements HasTable
 
     public function handleConfirmSave($data, $section)
     {
-        // dd($data, $section);
+        dd($data, $section);
         foreach ($data as $item) {
             // ค้นหาข้อมูลตาม FCSKID
             $setupTag = SetupTag::where('FCSKID', $item['FCSKID'])->first();
