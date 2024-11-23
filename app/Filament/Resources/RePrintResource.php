@@ -21,7 +21,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Grid;
-use Auth;
+use Filament\Tables\Filters\SelectFilter;
 
 class RePrintResource extends Resource
 {
@@ -153,6 +153,15 @@ class RePrintResource extends Resource
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('job_master')
+                    ->label('Job Master')
+                    ->options(
+                        JobHead::query()
+                            ->distinct() // ดึงเฉพาะค่าที่ไม่ซ้ำ
+                            ->pluck('job_master', 'job_master')
+                            ->toArray()
+                    )
+                    ->searchable(), // ทำให้ Filter สามารถค้นหาได้
             ])
             ->actions([
                 ViewAction::make()

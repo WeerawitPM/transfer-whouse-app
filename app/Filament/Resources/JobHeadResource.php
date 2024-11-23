@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\JobHeadResource\Pages;
-use App\Filament\Resources\JobHeadResource\RelationManagers;
 use App\Models\JobHead;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +11,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
 use Auth;
+use Filament\Tables\Filters\SelectFilter;
 
 class JobHeadResource extends Resource
 {
@@ -95,7 +95,15 @@ class JobHeadResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('job_master')
+                    ->label('Job Master')
+                    ->options(
+                        JobHead::query()
+                            ->distinct() // ดึงเฉพาะค่าที่ไม่ซ้ำ
+                            ->pluck('job_master', 'job_master')
+                            ->toArray()
+                    )
+                    ->searchable(), // ทำให้ Filter สามารถค้นหาได้
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
