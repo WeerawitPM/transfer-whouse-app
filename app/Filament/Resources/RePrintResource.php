@@ -52,6 +52,15 @@ class RePrintResource extends Resource
                                         TextInput::make('job_no')
                                             ->label('Job No')
                                             ->maxLength(255),
+                                        TextInput::make('doc_no')
+                                            ->label('Doc No')
+                                            ->maxLength(255),
+                                        TextInput::make('doc_ref_no')
+                                            ->label('Doc Ref No')
+                                            ->maxLength(255),
+                                        TextInput::make('job_master')
+                                            ->label('Job Master')
+                                            ->maxLength(255),
                                         TextInput::make('department')
                                             ->label('Department')
                                             ->maxLength(255),
@@ -74,23 +83,17 @@ class RePrintResource extends Resource
                                     ->relationship('jobDetails')
                                     ->schema([
                                         TextInput::make('kanban')
-                                            ->label('Kanban')
-                                            ->disabled(),
+                                            ->label('Kanban'),
                                         TextInput::make('part_no')
-                                            ->label('Part No')
-                                            ->disabled(),
+                                            ->label('Part No'),
                                         TextInput::make('part_name')
-                                            ->label('Part Name')
-                                            ->disabled(),
+                                            ->label('Part Name'),
                                         TextInput::make('model')
-                                            ->label('Model')
-                                            ->disabled(),
+                                            ->label('Model'),
                                         TextInput::make('qty')
-                                            ->label('Quantity')
-                                            ->disabled(),
+                                            ->label('Quantity'),
                                     ])
                                     ->disableItemMovement()
-                                    ->disabled()
                             ]),
                         Tab::make('Job To Tags')
                             ->schema([
@@ -98,23 +101,17 @@ class RePrintResource extends Resource
                                     ->relationship('jobToTags')
                                     ->schema([
                                         TextInput::make('kanban')
-                                            ->label('Kanban')
-                                            ->disabled(),
+                                            ->label('Kanban'),
                                         TextInput::make('part_no')
-                                            ->label('Part No')
-                                            ->disabled(),
+                                            ->label('Part No'),
                                         TextInput::make('part_name')
-                                            ->label('Part Name')
-                                            ->disabled(),
+                                            ->label('Part Name'),
                                         TextInput::make('model')
-                                            ->label('Model')
-                                            ->disabled(),
+                                            ->label('Model'),
                                         TextInput::make('qty')
-                                            ->label('Quantity')
-                                            ->disabled(),
+                                            ->label('Quantity'),
                                     ])
                                     ->disableItemMovement()
-                                    ->disabled()
                             ]),
                     ])
                     ->columnSpanFull()
@@ -124,6 +121,8 @@ class RePrintResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('job_no','desc')
+            // ->defaultGroup('job_master')
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -134,6 +133,12 @@ class RePrintResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('job_no')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('doc_no')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('doc_ref_no')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('job_master')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('department')
                     ->searchable(),
@@ -148,7 +153,6 @@ class RePrintResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
             ])
             ->actions([
                 ViewAction::make()

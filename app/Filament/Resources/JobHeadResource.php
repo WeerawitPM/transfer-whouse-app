@@ -55,6 +55,7 @@ class JobHeadResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('job_no', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -65,10 +66,16 @@ class JobHeadResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('job_no')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('doc_no')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('doc_ref_no')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('job_master')
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('department')
                     ->searchable(),
