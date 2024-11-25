@@ -11,6 +11,80 @@
         }
     });
 
+    function addRowToPartsTable(index) {
+        // ค้นหาแถวที่มี data-index ตรงกับ index
+        const row = document.querySelector(`tr[data-index="${index}"]`);
+
+        if (!row) {
+            console.error(`Row with index ${index} not found.`);
+            return;
+        }
+
+        const FCSKID = row.querySelector('input[data-key="FCSKID"]').value;
+        const FCCODE = row.querySelector('td[data-key="FCCODE"]').textContent.trim();
+        const FCSNAME = row.querySelector('td[data-key="FCSNAME"]').textContent.trim();
+        const FCNAME = row.querySelector('td[data-key="FCNAME"]').textContent.trim();
+        const MODEL = row.querySelector('input[data-key="MODEL"]').value;
+        const SMODEL = row.querySelector('input[data-key="SMODEL"]').value;
+        const STOCKQTY = row.querySelector('td[data-key="STOCKQTY"]').textContent.trim();
+        // อ่านค่าของ packing_qty และ qty
+        const packingQty = row.querySelector('input[data-key="packing_qty"]').value;
+        const qty = row.querySelector('input[data-key="qty"]').value;
+
+        // ตรวจสอบว่า STOCKQTY เป็น 0 หรือไม่
+        if (parseFloat(STOCKQTY) === 0 || isNaN(parseFloat(STOCKQTY))) {
+            @this.handleNotification(
+                "เกิดข้อผิดพลาด",
+                "ไม่สามารถเพิ่มข้อมูลได้ เนื่องจาก Stock มีค่าเป็น 0",
+                "warning"
+            );
+            return;
+        }
+
+        // ตรวจสอบ row ที่ซ้ำกันใน partsTable
+        const existingRow = document.querySelector(`#partsTable tbody tr[data-fcskid="${FCSKID}"]`);
+        if (existingRow) {
+            @this.handleNotification(
+                "เกิดข้อผิดพลาด",
+                "ข้อมูลนี้ถูกเพิ่มในตารางแล้ว",
+                "danger"
+            );
+            return;
+        }
+
+        // เพิ่มแถวใหม่ใน partsTable
+        const partsTableBody = document.querySelector("#partsTable tbody");
+        const newRow = document.createElement("tr");
+        newRow.setAttribute("data-fcskid", FCSKID);
+
+        newRow.innerHTML = `
+        <td class="px-4 py-3 text-center" data-key="FCSKID">${FCSKID}</td>
+        <td class="px-4 py-3 text-center" data-key="FCCODE">${FCCODE}</td>
+        <td class="px-4 py-3 text-center" data-key="FCSNAME">${FCSNAME}</td>
+        <td class="px-4 py-3 text-center" data-key="FCNAME">${FCNAME}</td>
+        <td class="px-4 py-3 text-center" data-key="MODEL">${MODEL}</td>
+        <td class="px-4 py-3 text-center" data-key="SMODEL">${SMODEL}</td>
+        <td class="px-4 py-3 text-center" data-key="STOCKQTY">${STOCKQTY}</td>
+        <td class="px-4 py-3 text-center">
+            <input type="number" min="0" required class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-gray-200 dark:border-0" style="width: 100px" value="${packingQty}" data-key="packing_qty">
+        </td>
+        <td class="px-4 py-3 text-center">
+            <input type="number" min="0" required class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-gray-200 dark:border-0" style="width: 100px" value="${qty}" data-key="qty">
+        </td>
+        <td class="px-4 py-3 text-center">
+            <button class="bg-red-500 text-white rounded px-2 py-1" onclick="deleteRow(this, '${FCSKID}')">Remove</button>
+        </td>
+    `;
+
+        partsTableBody.appendChild(newRow);
+        // @this.handleNotification(
+        //     "สำเร็จ",
+        //     "ข้อมูลนี้ถูกเพิ่มในตารางแล้ว",
+        //     "success"
+        // );
+        return;
+    }
+
     function deleteRow(button, index) {
         // ยืนยันการลบ
         if (confirm('คุณต้องการจะลบรายการนี้ใช่หรือไม่?')) {
@@ -18,35 +92,37 @@
             const row = button.closest('tr');
             // ลบแถว
             row.remove();
-            @this.call('removePart', index);
         }
     }
 
     function handleSave() {
         const table = document.getElementById('partsTable');
-        const tableRows = table.querySelectorAll('tbody tr');
-        // const partData = [];
-        let hasDataEmptyError = false;
+        const tableRows = table.querySelectorAll('tbody tr'); // ค้นหาแถวทั้งหมดใน partsTable
+        // console.log(tableRows);
         let hasPackingQtyError = false;
         let hasQtyError = false;
         let hasStockQtyError = false;
 
-        tableRows.forEach((row, index) => {
-            const FCSKIDElement = row.querySelector(`#FCSKID_${index}`);
-            if (!FCSKIDElement) {
-                // console.warn(`Skipping row ${index} due to missing elements`);
-                hasDataEmptyError = true;
-                return;
-            }
-            const FCSKID = row.querySelector(`#FCSKID_${index}`).textContent.trim();
-            const FCCODE = row.querySelector(`#FCCODE_${index}`).textContent.trim();
-            const FCSNAME = row.querySelector(`#FCSNAME_${index}`).textContent.trim();
-            const FCNAME = row.querySelector(`#FCNAME_${index}`).textContent.trim();
-            const MODEL = row.querySelector(`#MODEL_${index}`).textContent.trim();
-            const SMODEL = row.querySelector(`#SMODEL_${index}`).textContent.trim();
-            const stockQty = parseInt(row.querySelector(`#STOCKQTY_${index}`).textContent.trim());
-            const packingQtyInput = row.querySelector(`#packing_qty_${index}`);
-            const qtyInput = row.querySelector(`#qty_${index}`);
+        // ตรวจสอบว่ามีแถวใน partsTable หรือไม่
+        if (tableRows.length === 0) {
+            @this.handleNotification(
+                "เกิดข้อผิดพลาด",
+                "ไม่มีข้อมูลในตาราง กรุณาเพิ่มข้อมูลก่อนบันทึก",
+                "warning"
+            );
+            return; // ยุติการทำงานของฟังก์ชัน
+        }
+
+        tableRows.forEach((row) => {
+            const FCSKID = row.querySelector('td[data-key="FCSKID"]').textContent.trim();
+            const FCCODE = row.querySelector('td[data-key="FCCODE"]').textContent.trim();
+            const FCSNAME = row.querySelector('td[data-key="FCSNAME"]').textContent.trim();
+            const FCNAME = row.querySelector('td[data-key="FCNAME"]').textContent.trim();
+            const MODEL = row.querySelector('td[data-key="MODEL"]').textContent.trim();
+            const SMODEL = row.querySelector('td[data-key="SMODEL"]').textContent.trim();
+            const stockQty = parseInt(row.querySelector('td[data-key="STOCKQTY"]').textContent.trim());
+            const packingQtyInput = row.querySelector('input[data-key="packing_qty"]');
+            const qtyInput = row.querySelector('input[data-key="qty"]');
 
             const packingQty = packingQtyInput.value;
             const qty = qtyInput.value;
@@ -94,23 +170,17 @@
         });
 
         // หากไม่มีข้อผิดพลาด แสดงข้อมูลที่ผ่านการตรวจสอบ
-        if (!hasDataEmptyError && !hasPackingQtyError && !hasQtyError && !hasStockQtyError) {
-            // console.log(partData);
+        if (!hasPackingQtyError && !hasQtyError && !hasStockQtyError) {
+            console.log(partData);
             document.getElementById('openConfirmSaveModal').click();
         } else {
-            if (hasDataEmptyError) {
-                @this.handleNotification(
-                    "เกิดข้อผิดพลาด",
-                    "ไม่มีข้อมูลที่สามารถบันทึกได้ กรุณาตรวจสอบข้อมูลที่กรอก",
-                    "danger"
-                );
-            }
             if (hasPackingQtyError) {
                 @this.handleNotification(
                     "เกิดข้อผิดพลาด",
                     "Packing Qty ต้องมากกว่า 0 และต้องเป็นจำนวนเต็มบวกเท่านั้น",
                     "danger"
                 );
+                return;
             }
             if (hasQtyError) {
                 @this.handleNotification(
@@ -118,6 +188,7 @@
                     "Qty ต้องมากกว่า 0 และต้องเป็นจำนวนเต็มบวกเท่านั้น",
                     "danger"
                 );
+                return;
             }
             if (hasStockQtyError) {
                 @this.handleNotification(
@@ -125,6 +196,7 @@
                     "Qty ห้ามเกินจำนวนที่มีใน Stock",
                     "danger"
                 );
+                return;
             }
         }
     }
