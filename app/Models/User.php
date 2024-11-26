@@ -69,12 +69,12 @@ class User extends Authenticatable implements FilamentUser
 
     public function sect()
     {
-        return $this->belongsTo(sect::class, 'sect_id');
+        return $this->belongsTo(Sect::class, 'sect_id');
     }
 
     public function emplr()
     {
-        return $this->belongsTo(emplr::class, 'emplr_id');
+        return $this->belongsTo(Emplr::class, 'emplr_id');
     }
 
     public function canAccessPanel(Panel $panel): bool
