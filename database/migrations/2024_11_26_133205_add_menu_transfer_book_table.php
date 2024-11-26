@@ -10,18 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('transfer_books', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            $table->foreignId('transfer_ref_type_id')
-                ->nullable()
-                ->constrained('transfer_ref_types')
-                ->nullOnDelete();
-            $table->foreignId('book_id')
-                ->nullable()
-                ->constrained('books')
-                ->nullOnDelete();
-            $table->boolean('is_active');
+        Schema::table('transfer_books', function (Blueprint $table) {
             $table->boolean('is_menu_scan')->default(false);
             $table->boolean('is_menu_manual')->default(false);
             $table->boolean('is_menu_detail')->default(false);
@@ -33,6 +22,8 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('transfer_books');
+        Schema::table('transfer_books', function (Blueprint $table) {
+            //
+        });
     }
 };

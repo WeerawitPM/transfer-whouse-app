@@ -10,6 +10,9 @@ class TransferBook extends Model
         'transfer_ref_type_id',
         'book_id',
         'is_active',
+        'is_menu_scan',
+        'is_menu_manual',
+        'is_menu_detail',
     ];
 
     public function transfer_ref_type()

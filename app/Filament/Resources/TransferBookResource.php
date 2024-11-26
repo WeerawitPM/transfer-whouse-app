@@ -68,6 +68,12 @@ class TransferBookResource extends Resource
                     ->required(),
                 Forms\Components\Toggle::make('is_active')
                     ->required(),
+                Forms\Components\Toggle::make('is_menu_scan')
+                    ->required(),
+                Forms\Components\Toggle::make('is_menu_manual')
+                    ->required(),
+                Forms\Components\Toggle::make('is_menu_detail')
+                    ->required(),
             ]);
     }
 
@@ -90,6 +96,16 @@ class TransferBookResource extends Resource
                     ->formatStateUsing(fn(TransferBook $record) => "{$record->book->FCCODE} {$record->book->FCNAME}")
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_menu_scan')
+                    ->label('Scan Menu')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_menu_manual')
+                    ->label('Manual Menu')
+                    ->boolean(),
+                Tables\Columns\IconColumn::make('is_menu_detail')
+                    ->label('Detail Menu')
                     ->boolean(),
             ])
             ->filters([

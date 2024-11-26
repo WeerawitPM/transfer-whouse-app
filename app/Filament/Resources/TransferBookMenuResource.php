@@ -72,25 +72,25 @@ class TransferBookMenuResource extends Resource
                     ->color('primary')
                     ->button()
                     ->url(fn(TransferBook $record): string => self::getUrl('scan_tag', ['record' => $record]))
-                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
+                    ->visible(fn(TransferBook $record) => $record->is_menu_scan == true),
                 Tables\Actions\Action::make('manual')
                     ->label('Add Item')
                     ->color('primary')
                     ->button()
-                    ->url(fn(TransferBook $record): string => self::getUrl('manual', ['record' => $record])),
-                    // ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
+                    ->url(fn(TransferBook $record): string => self::getUrl('manual', ['record' => $record]))
+                    ->visible(fn(TransferBook $record) => $record->is_menu_manual === true),
                 Tables\Actions\Action::make('wr_detail')
                     ->label('Detail')
                     ->color('primary')
                     ->button()
                     ->url(fn(TransferBook $record): string => self::getUrl('wr_detail', ['record' => $record]))
-                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE === 'WR'),
+                    ->visible(fn(TransferBook $record) => $record->is_menu_detail === true && $record->transfer_ref_type->ref_type->FCCODE === 'WR'),
                 Tables\Actions\Action::make('detail')
                     ->label('Detail')
                     ->color('primary')
                     ->button()
                     ->url(fn(TransferBook $record): string => self::getUrl('detail', ['record' => $record]))
-                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
+                    ->visible(fn(TransferBook $record) => $record->is_menu_detail === true && $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
                 // ->openUrlInNewTab()
             ])
             ->striped();
