@@ -1,10 +1,4 @@
 <script>
-    const section = document.getElementById('section');
-    section.addEventListener('change', function() {
-        // console.log(section.value);
-        @this.handleUpdateSection(section.value);
-    });
-
     document.addEventListener("DOMContentLoaded", function() {
         const inputQrCode = document.getElementById('input_qr_code');
 
@@ -30,4 +24,29 @@
             });
         }
     });
+
+    function handleSave() {
+        const table = document.getElementById('partsTable');
+        const tableRows = table.querySelectorAll('tbody tr'); // ค้นหาแถวทั้งหมดใน partsTable
+        if (tableRows.length === 0) {
+            // @this.handleNotification(
+            //     "เกิดข้อผิดพลาด",
+            //     "ไม่มีข้อมูลในตาราง กรุณาเพิ่มข้อมูลก่อนบันทึก",
+            //     "warning"
+            // );
+            return; // ยุติการทำงานของฟังก์ชัน
+        }
+        document.getElementById('openConfirmSaveModal').click();
+    }
+
+    function confirmSaveModal() {
+        const section = document.getElementById('section');
+        // console.log(section.value);
+        const btn_save = document.getElementById('btn_save');
+        btn_save.style.display = "none";
+        @this.$dispatch('close-modal', {
+            id: 'confirmSaveModal'
+        });
+        @this.handleConfirmSave(section.value);
+    }
 </script>

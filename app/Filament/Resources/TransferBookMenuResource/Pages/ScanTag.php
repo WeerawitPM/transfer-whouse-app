@@ -50,8 +50,13 @@ class ScanTag extends Page
             ButtonAction::make('btn_save')
                 ->label('Save')
                 ->color('primary')
-                ->action('handleSave')
-                ->requiresConfirmation()
+                ->extraAttributes(
+                    [
+                        'id' => 'btn_save',
+                        'onclick' => 'handleSave()',
+                    ]
+                )
+                // ->requiresConfirmation()
             // ->icon('heroicon-o-cloud'),
         ];
     }
@@ -96,7 +101,7 @@ class ScanTag extends Page
                         ->send();
                     return;
                 }
-                
+
                 $this->tags[] = $tag->toArray();
                 $this->updateTagsDetail();
                 return;
@@ -145,9 +150,9 @@ class ScanTag extends Page
         // dd($this->tags_detail);
     }
 
-    public function handleSave()
+    public function handleConfirmSave($section)
     {
-        // dd($this->section);
+        // dd($section);
         $jobToTag = $this->tags;
         $jobDetail = $this->tags_detail;
 
@@ -163,8 +168,8 @@ class ScanTag extends Page
         $user = Auth::user();
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
         $remark = "Scan";
-        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark, $this->section);
-        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark, $this->section);
+        handleSaveProduct::handleSaveProduct($jobDetail, $book, $user, $remark, $section);
+        handleSaveWrProduct::handleSaveWrProduct($jobDetail, $user, $remark, $section);
         // handleJob::handleUpdateJobHead($job_id);
         handleJob::handleUpdateJobToTag($jobToTag);
         // handleJob::handleUpdateJobDetail($jobDetail);

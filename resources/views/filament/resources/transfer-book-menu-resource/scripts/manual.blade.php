@@ -186,7 +186,7 @@
 
         // หากไม่มีข้อผิดพลาด แสดงข้อมูลที่ผ่านการตรวจสอบ
         if (!hasPackingQtyError && !hasQtyError && !hasStockQtyError) {
-            console.log(partData);
+            // console.log(partData);
             document.getElementById('openConfirmSaveModal').click();
         } else {
             if (hasPackingQtyError) {

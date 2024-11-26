@@ -30,7 +30,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-sm text-gray-700 dark:text-gray-200">
-                            @forelse ($tags_detail as $index => $part)
+                            @foreach ($tags_detail as $index => $part)
                                 <tr class="{{ $index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800' }} border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition ease-in-out duration-150"
                                     id="tr_{{ $index }}" name="tr_{{ $index }}">
                                     <td class="px-4 py-3" id="part_no_{{ $index }}"
@@ -74,13 +74,14 @@
                                             wire:click="handleDeleteTagDetail({{ $index }})">Delete</x-filament::button>
                                     </td>
                                 </tr>
-                            @empty
+                            {{-- @empty
                                 <tr style="height: 250px">
                                     <td colspan="10" class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
                                         No data available
                                     </td>
                                 </tr>
-                            @endforelse
+                            @endforelse --}}
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -166,6 +167,24 @@
             </div>
         </div>
     </div>
+    <!-- Modal Confirm Save-->
+    <x-filament::modal id="confirmSaveModal" width="md" :close-by-clicking-away="false">
+        <x-slot name="trigger" style="display: none;">
+            <button id="openConfirmSaveModal"></button>
+        </x-slot>
+        <x-slot name="heading">
+            ยืนยันการบันทึก
+        </x-slot>
+        <p>คุณต้องการบันทึกข้อมูลนี้ใช่หรือไม่?</p>
+        <div class="mt-4 flex justify-end gap-2">
+            <x-filament::button type="button" color="danger"
+                @click="$dispatch('close-modal', {id: 'confirmSaveModal'})">
+                ยกเลิก
+            </x-filament::button>
+            <x-filament::button type="button" color="primary"
+                onclick="confirmSaveModal()">ยืนยัน</x-filament::button>
+        </div>
+    </x-filament::modal>
 </x-filament-panels::page>
 
 @include('filament.resources.transfer-book-menu-resource.scripts.scan-tag')
