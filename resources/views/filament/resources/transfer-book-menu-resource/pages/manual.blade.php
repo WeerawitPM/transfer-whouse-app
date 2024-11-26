@@ -38,23 +38,23 @@
                                 <input type="hidden" data-key="FCSKID" value="{{ $product['FCSKID'] }}" />
                                 <input type="hidden" data-key="MODEL" value="{{ $product['MODEL'] }}" />
                                 <input type="hidden" data-key="SMODEL" value="{{ $product['SMODEL'] }}" />
-                                <td class="py-3 text-center" data-key="FCCODE">{{ $product['CPART_NO'] }}</td>
-                                <td class="py-3 text-center" data-key="FCSNAME">{{ $product['CCODE'] }}</td>
-                                <td class="py-3 text-center" data-key="FCNAME">{{ $product['CPART_NAME'] }}</td>
-                                <td class="py-3 text-center @if ($book->from_whs->FCCODE == 'YYY' || $book->from_whs->FCCODE == 'XXX') hidden @endif" data-key="STOCKQTY">
+                                <td class="py-3 px-3 text-center" data-key="FCCODE">{{ $product['CPART_NO'] }}</td>
+                                <td class="py-3 px-3 text-center" data-key="FCSNAME">{{ $product['CCODE'] }}</td>
+                                <td class="py-3 px-3 text-center" data-key="FCNAME">{{ $product['CPART_NAME'] }}</td>
+                                <td class="py-3 px-3 text-center @if ($book->from_whs->FCCODE == 'YYY' || $book->from_whs->FCCODE == 'XXX') hidden @endif" data-key="STOCKQTY">
                                     {{ number_format($product['STOCKQTY'], 0) }}</td>
-                                <td class="py-3 text-center">
+                                <td class="py-3 px-3 text-center">
                                     <input type="number" min="0" required wire:ignore
                                         class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-gray-200 dark:border-0"
                                         data-key="packing_qty" style="width: 100px"
                                         value="{{ $packing[$product['FCSKID']]->packing_qty ?? 0 }}">
                                 </td>
-                                <td class="py-3 text-center">
+                                <td class="py-3 px-3 text-center">
                                     <input type="number" min="0" required wire:ignore
                                         class="dark:bg-gray-700 text-gray-900 dark:text-white rounded p-1 border-gray-200 dark:border-0"
                                         data-key="qty" style="width: 100px" value="0">
                                 </td>
-                                <td class="py-3 text-center">
+                                <td class="py-3 px-3 text-center">
                                     <x-filament::button color="success" size="sm"
                                         onclick="addRowToPartsTable({{ $index }})">Add</x-filament::button>
                                 </td>

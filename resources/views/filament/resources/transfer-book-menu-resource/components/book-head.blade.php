@@ -6,11 +6,11 @@
 
 <x-filament::card>
     <style>
-        .hidden {
+        .hidden_section {
             display: none;
         }
 
-        .show {
+        .show_section {
             display: block;
         }
     </style>
@@ -63,7 +63,7 @@
                     </button>
                     <input type="hidden" name="section" id="section" value="{{ $user->sect->FCSKID ?? '' }}" wire:ignore />
                     <div id="dropdownMenu"
-                        class="hidden absolute bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg w-full max-h-60 overflow-y-auto z-10">
+                        class="hidden_section absolute bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg w-full max-h-60 overflow-y-auto z-10">
                         <div class="p-2">
                             <input type="text" id="searchInput" placeholder="Search..."
                                 class="w-full bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 rounded-lg py-1 px-2 text-gray-700 dark:text-gray-200 text-sm">
@@ -71,7 +71,7 @@
                         <ul id="dropdownList" class="list-none p-2">
                             @foreach ($sections as $section)
                                 <li data-value="{{ $section['FCSKID'] }}"
-                                    class="py-1 px-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    class="py-1 px-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">
                                     {{ $section['FCNAME'] }}
                                 </li>
                             @endforeach
@@ -92,13 +92,13 @@
 
     // เปิด-ปิด dropdown เมื่อกดปุ่ม
     dropdownButton.addEventListener('click', function() {
-        dropdownMenu.classList.toggle('show');
+        dropdownMenu.classList.toggle('show_section');
     });
 
     // ซ่อน dropdown เมื่อคลิกข้างนอก
     document.addEventListener('click', function(event) {
         if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-            dropdownMenu.classList.remove('show');
+            dropdownMenu.classList.remove('show_section');
         }
     });
 
@@ -124,7 +124,7 @@
             section.value = selectedValue;
 
             // ซ่อน dropdown
-            dropdownMenu.classList.remove('show');
+            dropdownMenu.classList.remove('show_section');
 
             // console.log('Selected Value:', section.value);
         }
