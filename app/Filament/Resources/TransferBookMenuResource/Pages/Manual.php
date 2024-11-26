@@ -92,7 +92,9 @@ class Manual extends Page
     {
         $this->cpart_no = $state;
         $this->fc_type = $product_type;
-        $this->products = FormulaStockProd::getProduct($this->fc_type, $this->cpart_no ?? "")->limit(10)->get()->toArray();
+        $from_whs = $this->book->from_whs->FCSKID;
+        // dd($from_whs);
+        $this->products = FormulaStockProd::getProduct($this->fc_type, $this->cpart_no ?? "", $from_whs)->limit(10)->get()->toArray();
         // dd($this->products);
         $this->packing = SetupTag::all()->keyBy('FCSKID'); // สร้างคีย์ตาม FCSKID
     }
@@ -119,7 +121,7 @@ class Manual extends Page
 
     public function handleConfirmSave($data, $section)
     {
-        dd($data, $section);
+        // dd($data, $section);
         foreach ($data as $item) {
             // ค้นหาข้อมูลตาม FCSKID
             $setupTag = SetupTag::where('FCSKID', $item['FCSKID'])->first();
@@ -146,7 +148,7 @@ class Manual extends Page
         // dd($data);
 
         $user = Auth::user();
-        $book = TransferBook::where('id', $this->id)->get()->first()->book;
+        $book = $this->book;
         $remark = "Manual";
         handleSaveProduct::handleSaveProduct($data, $book, $user, $remark, $section);
         // handleSaveWrProduct::handleSaveWrProduct($data, $user, $remark);

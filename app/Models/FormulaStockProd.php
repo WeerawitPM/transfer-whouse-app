@@ -23,7 +23,7 @@ class FormulaStockProd extends Model
     protected $fillable = [
     ];
 
-    public static function getProduct($fcType, $fcPart)
+    public static function getProduct($fcType, $fcPart, $whouse)
     {
         return self::selectRaw('
                 LTRIM(RTRIM(U.FCNAME)) AS UM, 
@@ -44,10 +44,10 @@ class FormulaStockProd extends Model
                 $query->where('PROD.FCCODE', 'LIKE', '%' . $fcPart . '%')
                     ->orWhere('PROD.FCNAME', 'LIKE', '%' . $fcPart . '%');
             })
-            ->where('S.FCWHOUSE', 'H2u7qN01');
+            ->where('S.FCWHOUSE', $whouse);
     }
 
-    public static function getSelectedProduct($fcType, $part_selected)
+    public static function getSelectedProduct($fcType, $part_selected, $whouse)
     {
         $part_selected = is_array($part_selected) ? $part_selected : (is_null($part_selected) ? [] : [$part_selected]);
 
@@ -71,7 +71,7 @@ class FormulaStockProd extends Model
                     $query->orWhere('PROD.FCCODE', '=', '%' . $part . '%');
                 }
             })
-            ->where('S.FCWHOUSE', 'H2u7qN01');
+            ->where('S.FCWHOUSE', $whouse);
     }
 
 }

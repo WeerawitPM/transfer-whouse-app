@@ -77,8 +77,8 @@ class TransferBookMenuResource extends Resource
                     ->label('Add Item')
                     ->color('primary')
                     ->button()
-                    ->url(fn(TransferBook $record): string => self::getUrl('manual', ['record' => $record]))
-                    ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
+                    ->url(fn(TransferBook $record): string => self::getUrl('manual', ['record' => $record])),
+                    // ->visible(fn(TransferBook $record) => $record->transfer_ref_type->ref_type->FCCODE != 'WR'),
                 Tables\Actions\Action::make('wr_detail')
                     ->label('Detail')
                     ->color('primary')

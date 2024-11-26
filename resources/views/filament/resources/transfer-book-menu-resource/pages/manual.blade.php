@@ -25,7 +25,7 @@
                             <th class="py-3">Part No</th>
                             <th class="py-3">Part Code</th>
                             <th class="py-3">Part Name</th>
-                            <th class="py-3">Stock Qty</th>
+                            <th class="py-3 @if ($book->from_whs->FCCODE == 'YYY' || $book->from_whs->FCCODE == 'XXX') hidden @endif">Stock Qty</th>
                             <th class="py-3">Packing Qty</th>
                             <th class="py-3">Qty</th>
                             <th class="py-3">Action</th>
@@ -41,7 +41,7 @@
                                 <td class="py-3 text-center" data-key="FCCODE">{{ $product['CPART_NO'] }}</td>
                                 <td class="py-3 text-center" data-key="FCSNAME">{{ $product['CCODE'] }}</td>
                                 <td class="py-3 text-center" data-key="FCNAME">{{ $product['CPART_NAME'] }}</td>
-                                <td class="py-3 text-center" data-key="STOCKQTY">
+                                <td class="py-3 text-center @if ($book->from_whs->FCCODE == 'YYY' || $book->from_whs->FCCODE == 'XXX') hidden @endif" data-key="STOCKQTY">
                                     {{ number_format($product['STOCKQTY'], 0) }}</td>
                                 <td class="py-3 text-center">
                                     <input type="number" min="0" required wire:ignore
@@ -84,7 +84,7 @@
                     <th class="px-4 py-3">Part Name</th>
                     <th class="px-4 py-3">Model</th>
                     <th class="px-4 py-3">SModel</th>
-                    <th class="px-4 py-3">Stock Qty</th>
+                    <th class="px-4 py-3 @if ($book->from_whs->FCCODE == 'YYY' || $book->from_whs->FCCODE == 'XXX') hidden @endif">Stock Qty</th>
                     <th class="px-4 py-3">Packing Qty</th>
                     <th class="px-4 py-3">Qty</th>
                     <th class="px-4 py-3"></th>

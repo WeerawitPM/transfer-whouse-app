@@ -22,7 +22,7 @@
             </label>
             <input
                 class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 text-sm"
-                type="text" value="{{ $book['FCCODE'] }}" readonly>
+                type="text" value="{{ $book['FCCODE'] }}" id="book_name" name="book_name" readonly>
         </div>
         <div class="w-full md:w-1/2 px-3">
             <label class="block tracking-wide text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
@@ -30,7 +30,7 @@
             </label>
             <input
                 class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 text-sm"
-                type="text" value="{{ $book['FCPREFIX'] }}" readonly>
+                type="text" value="{{ $book['FCPREFIX'] }}" id="book_prefix" name="book_prefix" readonly>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
             </label>
             <input
                 class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 text-sm"
-                type="text" value="{{ $book['from_whs']['FCCODE'] }}" readonly>
+                type="text" value="{{ $book['from_whs']['FCCODE'] }}" id="from_whs" name="from_whs" readonly>
         </div>
         <div class="w-full md:w-1/3 px-3 mb-2">
             <label class="block tracking-wide text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
@@ -49,7 +49,7 @@
             </label>
             <input
                 class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 text-sm"
-                type="text" value="{{ $book['to_whs']['FCCODE'] }}" readonly>
+                type="text" value="{{ $book['to_whs']['FCCODE'] }}" id="to_whs" name="to_whs" readonly>
         </div>
         <div class="w-full md:w-1/3 px-3">
             <label class="block tracking-wide text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
