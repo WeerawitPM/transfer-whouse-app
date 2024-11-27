@@ -9,6 +9,7 @@ use App\Models\Emplr;
 use App\Models\Sect;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -26,6 +27,18 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
+                Grid::make(1)
+                    ->schema([
+                        Forms\Components\FileUpload::make('avatar_url')
+                            ->alignCenter()
+                            ->image()
+                            ->avatar()
+                            ->imageEditor()
+                            ->disk(config('filament-edit-profile.disk', 'public'))
+                            ->visibility(config('filament-edit-profile.visibility', 'public'))
+                            ->directory(filament('filament-edit-profile')->getAvatarDirectory())
+                            ->rules(filament('filament-edit-profile')->getAvatarRules()),
+                    ]),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -45,8 +58,6 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('emp_id')
                     ->numeric(),
-                Forms\Components\FileUpload::make('avatar_url')
-                    ->image(),
                 Select::make('corp_id')
                     ->searchable()
                     ->required()

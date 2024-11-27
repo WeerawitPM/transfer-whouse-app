@@ -67,19 +67,24 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->databaseNotifications()
+            ->userMenuItems([
+                'edit-profile' => MenuItem::make()
+                    // ->label(fn() => auth()->user()->name)
+                    ->label('Edit Profile')
+                    ->url(fn(): string => EditProfilePage::getUrl())
+                    ->icon('heroicon-m-pencil-square')
+            ])
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 FilamentEditProfilePlugin::make()
                     ->shouldRegisterNavigation(false)
                     ->shouldShowDeleteAccountForm(false)
                     ->shouldShowBrowserSessionsForm(false)
+                    ->shouldShowEditProfileForm(false)
                     ->shouldShowAvatarForm()
-            ])
-            ->userMenuItems([
-                'profile' => MenuItem::make()
-                    ->label(fn() => auth()->user()->name)
-                    ->url(fn(): string => EditProfilePage::getUrl())
-                    ->icon('heroicon-m-user-circle')
+                    ->customProfileComponents([
+                        \App\Livewire\CustomProfileComponent::class,
+                    ])
             ]);
     }
 }
