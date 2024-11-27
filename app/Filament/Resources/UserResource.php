@@ -45,7 +45,7 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('emp_id')
                     ->numeric(),
-                Forms\Components\FileUpload::make('image')
+                Forms\Components\FileUpload::make('avatar_url')
                     ->image(),
                 Select::make('corp_id')
                     ->searchable()
@@ -111,13 +111,15 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar_url'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -132,7 +134,6 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('emp_id')
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('corp')
                     ->formatStateUsing(fn(User $record) => "{$record->corp->FCCODE} {$record->corp->FCNAME}")
                     ->sortable(),

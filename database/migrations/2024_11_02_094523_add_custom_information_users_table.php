@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->integer('emp_id')->nullable();
-            $table->string('image')->nullable();
+            // $table->string('image')->nullable();
             $table->foreignId('corp_id')
                 ->nullable()
                 ->constrained('corps')

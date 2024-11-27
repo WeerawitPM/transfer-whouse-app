@@ -9,8 +9,10 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Support\Facades\Storage;
+use Filament\Models\Contracts\HasAvatar;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles;
@@ -27,11 +29,11 @@ class User extends Authenticatable implements FilamentUser
         'first_name',
         'last_name',
         'emp_id',
-        'image',
         'corp_id',
         'dept_id',
         'sect_id',
         'emplr_id',
+        'avatar_url',
     ];
 
     /**
@@ -81,5 +83,10 @@ class User extends Authenticatable implements FilamentUser
     {
         return true;
         // return str_ends_with($this->email, '@yourdomain.com') && $this->hasVerifiedEmail();
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->avatar_url ? Storage::url("$this->avatar_url") : null;
     }
 }
