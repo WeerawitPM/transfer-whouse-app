@@ -74,7 +74,7 @@
                                             wire:click="handleDeleteTagDetail({{ $index }})">Delete</x-filament::button>
                                     </td>
                                 </tr>
-                            {{-- @empty
+                                {{-- @empty
                                 <tr style="height: 250px">
                                     <td colspan="10" class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">
                                         No data available
@@ -89,7 +89,7 @@
 
             <div x-show="activeTab === 'tab2'">
                 <div class="mt-4 overflow-x-auto border dark:border-none rounded-lg">
-                    <table id="partsTable" class="w-full table-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
+                    <table id="partsTable2" class="w-full table-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
                         <thead
                             class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                             <tr>
@@ -133,8 +133,7 @@
                                         name="model_{{ $index }}">
                                         {{ $part['model'] }}
                                     </td>
-                                    <td class="px-4 py-3" id="qty_{{ $index }}"
-                                        name="qty_{{ $index }}">
+                                    <td class="px-4 py-3" id="qty_{{ $index }}" name="qty_{{ $index }}">
                                         {{ $part['qty'] }}
                                     </td>
                                     <td class="px-4 py-3" id="packing_name_{{ $index }}"
@@ -185,6 +184,5 @@
                 onclick="confirmSaveModal()">ยืนยัน</x-filament::button>
         </div>
     </x-filament::modal>
+    @include('filament.resources.transfer-book-menu-resource.scripts.scan-tag')
 </x-filament-panels::page>
-
-@include('filament.resources.transfer-book-menu-resource.scripts.scan-tag')

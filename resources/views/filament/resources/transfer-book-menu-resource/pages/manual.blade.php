@@ -87,7 +87,7 @@
                     <th class="px-4 py-3 @if ($book->from_whs->FCCODE == 'YYY' || $book->from_whs->FCCODE == 'XXX') hidden @endif">Stock Qty</th>
                     <th class="px-4 py-3">Packing Qty</th>
                     <th class="px-4 py-3">Qty</th>
-                    <th class="px-4 py-3"></th>
+                    <th class="px-4 py-3">Action</th>
                 </tr>
             </thead>
             <tbody class="text-sm text-gray-700 dark:text-gray-200">
@@ -112,6 +112,5 @@
             <x-filament::button type="button" color="primary" onclick="confirmSaveModal()">ยืนยัน</x-filament::button>
         </div>
     </x-filament::modal>
+    @include('filament.resources.transfer-book-menu-resource.scripts.manual')
 </x-filament-panels::page>
-
-@include('filament.resources.transfer-book-menu-resource.scripts.manual')

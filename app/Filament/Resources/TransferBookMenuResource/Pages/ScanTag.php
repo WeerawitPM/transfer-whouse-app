@@ -56,7 +56,7 @@ class ScanTag extends Page
                         'onclick' => 'handleSave()',
                     ]
                 )
-                // ->requiresConfirmation()
+            // ->requiresConfirmation()
             // ->icon('heroicon-o-cloud'),
         ];
     }
@@ -103,6 +103,10 @@ class ScanTag extends Page
                 }
 
                 $this->tags[] = $tag->toArray();
+                // จัดเรียง tags ตาม id จากมากไปน้อย
+                usort($this->tags, function ($a, $b) {
+                    return $b['id'] <=> $a['id'];
+                });
                 $this->updateTagsDetail();
                 return;
             }
@@ -193,6 +197,7 @@ class ScanTag extends Page
             $this->tags = array_values($this->tags); // Re-index the array after deletion
         }
 
+        $this->updateTagsDetail();
         Notification::make()
             ->title('ลบข้อมูลเรียบร้อยแล้ว')
             ->success()
