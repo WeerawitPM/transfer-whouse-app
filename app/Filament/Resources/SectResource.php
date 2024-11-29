@@ -17,7 +17,7 @@ class SectResource extends Resource
 {
     protected static ?string $model = Sect::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
     protected static ?string $navigationGroup = 'Formula';
 
     public static function form(Form $form): Form

@@ -27,7 +27,7 @@ class RePrintResource extends Resource
 {
     protected static ?string $model = JobHead::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-printer';
     protected static ?string $navigationLabel = 'Re-Print';
     protected static ?string $breadcrumb = 'Re-Print';
     protected static ?string $label = 'Re-Print';

@@ -15,7 +15,7 @@ class SetupTagResource extends Resource
 {
     protected static ?string $model = SetupTag::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationGroup = 'Setup';
 
     public static function getNavigationBadge(): ?string
