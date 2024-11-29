@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Filters\SelectFilter;
 
 class BookResource extends Resource
 {
@@ -62,21 +63,11 @@ class BookResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCREFTYPE')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('FCCORP')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCBRANCH')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('FCCODE')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCNAME')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('FCNAME2')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCACCBOOK')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCWHOUSE')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('FCPREFIX')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('from_whs')
                     ->formatStateUsing(fn(Book $record) => "{$record->from_whs->FCCODE} {$record->from_whs->FCNAME}")
@@ -84,9 +75,22 @@ class BookResource extends Resource
                 Tables\Columns\TextColumn::make('to_whs')
                     ->formatStateUsing(fn(Book $record) => "{$record->to_whs->FCCODE} {$record->to_whs->FCNAME}")
                     ->sortable(),
+                Tables\Columns\TextColumn::make('FCPREFIX')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('FCCORP')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('FCBRANCH')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('FCACCBOOK')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('FCWHOUSE')
+                    ->searchable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('FCREFTYPE')
+                    ->label('FCREFTYPE')
+                    ->options(Book::query()->distinct()->pluck('FCREFTYPE', 'FCREFTYPE'))
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
