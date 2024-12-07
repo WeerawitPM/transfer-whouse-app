@@ -17,16 +17,16 @@
                         <thead
                             class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                             <tr>
-                                <th class="px-4 py-3">Part No</th>
-                                <th class="px-4 py-3">Part Code</th>
-                                <th class="px-4 py-3">Part Name</th>
-                                <th class="px-4 py-3">model</th>
-                                <th class="px-4 py-3">Qty</th>
-                                <th class="px-4 py-3">Packing Name</th>
-                                <th class="px-4 py-3">From whs</th>
-                                <th class="px-4 py-3">To whs</th>
-                                <th class="px-4 py-3">Tag Qty</th>
-                                <th class="px-4 py-3">Action</th>
+                                <th class="text-start px-4 py-3">Part No</th>
+                                <th class="text-start px-4 py-3 hidden">Part Code</th>
+                                <th class="text-start px-4 py-3 hidden">Part Name</th>
+                                <th class="text-start px-4 py-3">model</th>
+                                <th class="text-start px-4 py-3">Qty</th>
+                                <th class="text-start px-4 py-3">Packing Name</th>
+                                <th class="text-start px-4 py-3 hidden">From whs</th>
+                                <th class="text-start px-4 py-3 hidden">To whs</th>
+                                <th class="text-start px-4 py-3">Tag Qty</th>
+                                <th class="text-start px-4 py-3">Action</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm text-gray-700 dark:text-gray-200">
@@ -37,11 +37,11 @@
                                         name="part_no_{{ $index }}">
                                         {{ $part['part_no'] }}
                                     </td>
-                                    <td class="px-4 py-3" id="part_code_{{ $index }}"
+                                    <td class="px-4 py-3 hidden" id="part_code_{{ $index }}"
                                         name="part_code_{{ $index }}">
                                         {{ $part['part_code'] }}
                                     </td>
-                                    <td class="px-4 py-3" id="part_name_{{ $index }}"
+                                    <td class="px-4 py-3 hidden" id="part_name_{{ $index }}"
                                         name="part_name_{{ $index }}">
                                         {{ $part['part_name'] }}
                                     </td>
@@ -57,11 +57,11 @@
                                         name="packing_name_{{ $index }}">
                                         {{ $part['packing_name'] }}
                                     </td>
-                                    <td class="px-4 py-3" id="from_whs_{{ $index }}"
+                                    <td class="px-4 py-3 hidden" id="from_whs_{{ $index }}"
                                         name="from_whs_{{ $index }}">
                                         {{ $part['from_whs'] }}
                                     </td>
-                                    <td class="px-4 py-3" id="to_whs_{{ $index }}"
+                                    <td class="px-4 py-3 hidden" id="to_whs_{{ $index }}"
                                         name="to_whs_{{ $index }}">
                                         {{ $part['to_whs'] }}
                                     </td>
