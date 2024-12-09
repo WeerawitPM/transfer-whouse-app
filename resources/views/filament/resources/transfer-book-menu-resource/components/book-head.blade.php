@@ -15,7 +15,7 @@
         }
     </style>
     {{-- Content --}}
-    <div class="flex flex-wrap -mx-3 mb-2">
+    <div class="flex -mx-3">
         <div class="w-full md:w-1/2 px-3 mb-2 md:mb-0">
             <label class="block tracking-wide text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
                 Book Name
@@ -34,8 +34,8 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap -mx-3 mb-2">
-        <div class="w-full md:w-1/3 px-3 mb-2 md:mb-0">
+    <div class="flex flex-wrap -mx-3">
+        <div class="w-1/2 md:w-1/3 px-3 my-2 md:mb-0">
             <label class="block tracking-wide text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
                 From whouse
             </label>
@@ -43,7 +43,7 @@
                 class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 text-sm"
                 type="text" value="{{ $book['from_whs']['FCCODE'] }}" id="from_whs" name="from_whs" readonly>
         </div>
-        <div class="w-full md:w-1/3 px-3 mb-2">
+        <div class="w-1/2 md:w-1/3 px-3 my-2">
             <label class="block tracking-wide text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
                 To whouse
             </label>
@@ -51,7 +51,7 @@
                 class="w-full rounded-lg border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 text-sm"
                 type="text" value="{{ $book['to_whs']['FCCODE'] }}" id="to_whs" name="to_whs" readonly>
         </div>
-        <div class="w-full md:w-1/3 px-3">
+        <div class="w-full md:w-1/3 px-3 my-2">
             <label class="block tracking-wide text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
                 Section
             </label>
