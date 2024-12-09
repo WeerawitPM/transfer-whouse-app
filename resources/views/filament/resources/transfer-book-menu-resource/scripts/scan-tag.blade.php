@@ -23,6 +23,14 @@
                 }
             });
         }
+
+        const focus_btn = document.getElementsByClassName('fi-input-wrp-icon');
+        console.log(focus_btn);
+        if (focus_btn) {
+            focus_btn[0].addEventListener('click', function() {
+                inputQrCode.focus();
+            });
+        }
     });
 
     function handleSave() {
