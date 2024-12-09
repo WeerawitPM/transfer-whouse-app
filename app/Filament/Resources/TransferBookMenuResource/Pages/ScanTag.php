@@ -109,9 +109,9 @@ class ScanTag extends Page
 
                 $this->tags[] = $tag->toArray();
                 // จัดเรียง tags ตาม id จากมากไปน้อย
-                // usort($this->tags, function ($a, $b) {
-                //     return $b['id'] <=> $a['id'];
-                // });
+                usort($this->tags, function ($a, $b) {
+                    return $b['id'] <=> $a['id'];
+                });
                 $this->updateTagsDetail();
                 return;
             }
