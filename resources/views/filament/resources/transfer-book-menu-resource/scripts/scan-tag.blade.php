@@ -3,8 +3,8 @@
         const inputQrCode = document.getElementById('input_qr_code');
 
         if (inputQrCode) {
+            inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
             inputQrCode.focus();
-            inputQrCode.inputMode = "none";
             inputQrCode.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
                     // console.log(section.value);
