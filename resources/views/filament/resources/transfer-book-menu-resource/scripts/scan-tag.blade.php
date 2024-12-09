@@ -11,7 +11,6 @@
                     event.preventDefault();
                     @this.handleQrCodeInput(inputQrCode.value);
                     inputQrCode.value = '';
-                    inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
                     inputQrCode.focus();
                 }
             });
@@ -21,7 +20,6 @@
                     event.preventDefault();
                     @this.handleQrCodeInput(inputQrCode.value);
                     inputQrCode.value = '';
-                    inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
                     inputQrCode.focus();
                 }
             });

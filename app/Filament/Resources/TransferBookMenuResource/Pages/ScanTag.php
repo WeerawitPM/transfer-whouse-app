@@ -67,6 +67,11 @@ class ScanTag extends Page
             TextInput::make('input_qr_code')
                 ->label('Scan Tag')
                 ->suffixIcon('heroicon-m-magnifying-glass')
+                ->extraInputAttributes([
+                    'type' => 'text',
+                    'inputmode' => 'none',
+                    'autocomplete' => "off",
+                ])
         ];
     }
 
