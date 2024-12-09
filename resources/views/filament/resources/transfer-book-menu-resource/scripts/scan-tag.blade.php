@@ -11,6 +11,7 @@
                     event.preventDefault();
                     @this.handleQrCodeInput(inputQrCode.value);
                     inputQrCode.value = '';
+                    inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
                     inputQrCode.focus();
                 }
             });
@@ -20,6 +21,7 @@
                     event.preventDefault();
                     @this.handleQrCodeInput(inputQrCode.value);
                     inputQrCode.value = '';
+                    inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
                     inputQrCode.focus();
                 }
             });
@@ -29,6 +31,7 @@
         // console.log(focus_btn);
         if (focus_btn) {
             focus_btn[0].addEventListener('click', function() {
+                inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
                 inputQrCode.focus();
             });
         }
