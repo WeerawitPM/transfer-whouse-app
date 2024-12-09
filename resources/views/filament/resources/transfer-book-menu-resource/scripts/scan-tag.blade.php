@@ -4,7 +4,7 @@
 
         if (inputQrCode) {
             inputQrCode.focus();
-            inputQrCode.blur();
+            inputQrCode.inputMode = "none";
             inputQrCode.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
                     // console.log(section.value);
@@ -30,8 +30,6 @@
         if (focus_btn) {
             focus_btn[0].addEventListener('click', function() {
                 inputQrCode.focus();
-                //disable keyboard
-                inputQrCode.blur();
             });
         }
     });
