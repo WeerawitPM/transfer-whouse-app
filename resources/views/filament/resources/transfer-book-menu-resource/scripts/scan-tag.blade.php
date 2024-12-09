@@ -3,7 +3,7 @@
         const inputQrCode = document.getElementById('input_qr_code');
 
         if (inputQrCode) {
-            inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
+            // inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
             inputQrCode.focus();
             inputQrCode.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
@@ -31,7 +31,6 @@
         // console.log(focus_btn);
         if (focus_btn) {
             focus_btn[0].addEventListener('click', function() {
-                inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
                 inputQrCode.focus();
             });
         }
