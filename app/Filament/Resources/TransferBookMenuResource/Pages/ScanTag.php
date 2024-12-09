@@ -30,6 +30,7 @@ class ScanTag extends Page
     public $sections;
     public $user;
     public $section;
+    public $count;
 
     public function mount()
     {
@@ -41,6 +42,7 @@ class ScanTag extends Page
         $this->sections = Sect::all()->toArray();
         $this->user = Auth::user();
         $this->section = $this->user->sect->FCSKID;
+        $this->count = 0;
         // dd($this->section);
     }
 
@@ -82,47 +84,48 @@ class ScanTag extends Page
         if ($this->input_qr_code == '') {
             return;
         }
+        $this->count++;
 
-        $tag = JobToTag::where('qr_code', $state)->get()->first();
+        // $tag = JobToTag::where('qr_code', $state)->get()->first();
         // dd($tag);
         // dd($tag['qr_code']);
         // dd($tag->part_no);
-        if ($tag) {
-            if ($tag->status == 1) {
-                Notification::make()
-                    ->title('Tag นี้ถูก scan ไปแล้ว')
-                    ->warning()
-                    ->color('warning')
-                    ->send();
-                return;
-            } else {
-                // Check if the qr_code already exists in tags
-                $existingTag = collect($this->tags)->firstWhere('qr_code', $tag->qr_code);
-                if ($existingTag) {
-                    Notification::make()
-                        ->title('Tag นี้ถูกเพิ่มแล้ว')
-                        ->warning()
-                        ->color('warning')
-                        ->send();
-                    return;
-                }
+        // if ($tag) {
+        //     if ($tag->status == 1) {
+        //         Notification::make()
+        //             ->title('Tag นี้ถูก scan ไปแล้ว')
+        //             ->warning()
+        //             ->color('warning')
+        //             ->send();
+        //         return;
+        //     } else {
+        //         // Check if the qr_code already exists in tags
+        //         $existingTag = collect($this->tags)->firstWhere('qr_code', $tag->qr_code);
+        //         if ($existingTag) {
+        //             Notification::make()
+        //                 ->title('Tag นี้ถูกเพิ่มแล้ว')
+        //                 ->warning()
+        //                 ->color('warning')
+        //                 ->send();
+        //             return;
+        //         }
 
-                $this->tags[] = $tag->toArray();
-                // จัดเรียง tags ตาม id จากมากไปน้อย
-                usort($this->tags, function ($a, $b) {
-                    return $b['id'] <=> $a['id'];
-                });
-                $this->updateTagsDetail();
-                return;
-            }
-        } else {
-            Notification::make()
-                ->title('ไม่พบ Tag')
-                ->warning()
-                ->color('warning')
-                ->send();
-            return;
-        }
+        //         $this->tags[] = $tag->toArray();
+        //         // จัดเรียง tags ตาม id จากมากไปน้อย
+        //         usort($this->tags, function ($a, $b) {
+        //             return $b['id'] <=> $a['id'];
+        //         });
+        //         $this->updateTagsDetail();
+        //         return;
+        //     }
+        // } else {
+        //     Notification::make()
+        //         ->title('ไม่พบ Tag')
+        //         ->warning()
+        //         ->color('warning')
+        //         ->send();
+        //     return;
+        // }
     }
 
     public function updateTagsDetail()
