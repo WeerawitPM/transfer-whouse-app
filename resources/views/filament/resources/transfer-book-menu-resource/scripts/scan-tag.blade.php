@@ -1,6 +1,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const inputQrCode = document.getElementById('input_qr_code');
+        const errorText = document.getElementById('error_text');
 
         if (inputQrCode) {
             // inputQrCode.setAttribute('readonly', true); // ปิดคีย์บอร์ด
@@ -9,18 +10,28 @@
                 if (event.key === 'Enter') {
                     // console.log(section.value);
                     event.preventDefault();
-                    @this.handleQrCodeInput(inputQrCode.value);
-                    inputQrCode.value = '';
-                    inputQrCode.focus();
+                    @this.handleQrCodeInput(inputQrCode.value).then((value) => {
+                        inputQrCode.value = '';
+                        inputQrCode.focus();
+                        console.log(value);
+                        errorText.textContent = value;
+                    });
+                    // inputQrCode.value = '';
+                    // inputQrCode.focus();
                 }
             });
 
             inputQrCode.addEventListener('keydown', function(event) {
                 if (event.keyCode == 9) { //tab pressed
                     event.preventDefault();
-                    @this.handleQrCodeInput(inputQrCode.value);
-                    inputQrCode.value = '';
-                    inputQrCode.focus();
+                    @this.handleQrCodeInput(inputQrCode.value).then((value) => {
+                        inputQrCode.value = '';
+                        inputQrCode.focus();
+                        console.log(value);
+                        errorText.textContent = value;
+                    });
+                    // inputQrCode.value = '';
+                    // inputQrCode.focus();
                 }
             });
         }

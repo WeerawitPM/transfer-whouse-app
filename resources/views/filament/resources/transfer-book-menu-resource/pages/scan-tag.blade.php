@@ -1,6 +1,7 @@
 <x-filament-panels::page>
     @include('filament.resources.transfer-book-menu-resource.components.book-head')
     {{ $this->form }}
+    <div class="text-red-500 text-center" id="error_text" wire:ignore></div>
     <div x-data="{ activeTab: 'tab1' }">
         <x-filament::tabs label="Content tabs" class="justify-start w-[165px]">
             <x-filament::tabs.item alpine-active="activeTab === 'tab1'" x-on:click="activeTab = 'tab1'">
@@ -10,12 +11,11 @@
                 Tags Detail
             </x-filament::tabs.item>
         </x-filament::tabs>
-        {{-- <div class="text-danger" id="count" wire:ignore>Count : {{ $count }}</div> --}}
         <div>
             <div x-show="activeTab === 'tab1'">
                 <div class="mt-4 overflow-x-auto border dark:border-none rounded-lg">
                     <table id="partsTable" class="w-full table-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
-                        <thead
+                        <thead wire:ignore
                             class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                             <tr>
                                 <th class="text-start px-4 py-3">Part No</th>
@@ -91,7 +91,7 @@
             <div x-show="activeTab === 'tab2'">
                 <div class="mt-4 overflow-x-auto border dark:border-none rounded-lg">
                     <table id="partsTable2" class="w-full table-auto bg-white dark:bg-gray-800 shadow-md rounded-lg">
-                        <thead
+                        <thead wire:ignore
                             class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                             <tr>
                                 <th class="px-4 py-3">ID</th>

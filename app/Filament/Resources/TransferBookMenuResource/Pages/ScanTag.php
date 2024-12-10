@@ -92,7 +92,7 @@ class ScanTag extends Page
             //     ->warning()
             //     ->color('warning')
             //     ->send();
-            return;
+            return 'Tag นี้ถูกเพิ่มแล้ว';
         }
 
         $tag = JobToTag::where('qr_code', $state)->first();
@@ -106,7 +106,7 @@ class ScanTag extends Page
                 //     ->warning()
                 //     ->color('warning')
                 //     ->send();
-                return;
+                return 'Tag นี้ถูก scan ไปแล้ว';
             } else {
                 $this->tags[] = $tag->toArray();
                 // จัดเรียง tags ตาม id จากมากไปน้อย
@@ -122,7 +122,7 @@ class ScanTag extends Page
             //     ->warning()
             //     ->color('warning')
             //     ->send();
-            return;
+            return 'ไม่พบ Tag';
         }
     }
 
