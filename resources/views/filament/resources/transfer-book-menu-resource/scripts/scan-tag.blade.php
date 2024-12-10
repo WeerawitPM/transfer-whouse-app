@@ -30,7 +30,7 @@
                             const exists = tagsDetail.some(tag => tag.qr_code === value
                                 .qr_code);
                             if (exists) {
-                                alert("ข้อมูลนี้มีอยู่ในตารางแล้ว!");
+                                errorText.textContent = "ข้อมูลนี้มีอยู่ในตารางแล้ว!";
                             } else {
                                 tagsDetail.push(value);
                                 updateTableBody2(value);
