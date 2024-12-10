@@ -11,13 +11,11 @@
                     // console.log(section.value);
                     event.preventDefault();
                     @this.handleQrCodeInput(inputQrCode.value).then((value) => {
-                        inputQrCode.value = '';
-                        inputQrCode.focus();
-                        console.log(value);
+                        // console.log(value);
                         errorText.textContent = value;
                     });
-                    // inputQrCode.value = '';
-                    // inputQrCode.focus();
+                    inputQrCode.value = '';
+                    inputQrCode.focus();
                 }
             });
 
@@ -25,13 +23,11 @@
                 if (event.keyCode == 9) { //tab pressed
                     event.preventDefault();
                     @this.handleQrCodeInput(inputQrCode.value).then((value) => {
-                        inputQrCode.value = '';
-                        inputQrCode.focus();
-                        console.log(value);
+                        // console.log(value);
                         errorText.textContent = value;
                     });
-                    // inputQrCode.value = '';
-                    // inputQrCode.focus();
+                    inputQrCode.value = '';
+                    inputQrCode.focus();
                 }
             });
         }
