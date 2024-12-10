@@ -25,8 +25,19 @@
                     @this.handleQrCodeInput(inputQrCode.value).then((value) => {
                         if (typeof value == 'string') {
                             errorText.textContent = value;
+                        } else {
+                            // ตรวจสอบว่า qr_code มีอยู่ใน tagsDetail หรือไม่
+                            const exists = tagsDetail.some(tag => tag.qr_code === value
+                                .qr_code);
+                            if (exists) {
+                                alert("ข้อมูลนี้มีอยู่ในตารางแล้ว!");
+                            } else {
+                                tagsDetail.push(value);
+                                updateTableBody2(value);
+                                updateTags(); // อัปเดต tags หลังเพิ่มข้อมูลใน tagsDetail
+                                // console.log(tags);
+                            }
                         }
-                        // console.log(value);
                     });
                     inputQrCode.value = '';
                     inputQrCode.focus();
