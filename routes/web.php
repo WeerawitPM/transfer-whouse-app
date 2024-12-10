@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RedirectToWeb;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ScanController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -23,5 +24,6 @@ Route::middleware(RedirectToWeb::class)->group(function () {
     });
 });
 
+Route::resource('index', ScanController::class);
 
 require __DIR__ . '/auth.php';

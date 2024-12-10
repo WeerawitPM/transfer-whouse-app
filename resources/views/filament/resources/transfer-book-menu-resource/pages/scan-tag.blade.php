@@ -10,7 +10,7 @@
                 Tags Detail
             </x-filament::tabs.item>
         </x-filament::tabs>
-        <div class="text-danger">Count : {{ $count }}</div>
+        {{-- <div class="text-danger" id="count" wire:ignore>Count : {{ $count }}</div> --}}
         <div>
             <div x-show="activeTab === 'tab1'">
                 <div class="mt-4 overflow-x-auto border dark:border-none rounded-lg">
