@@ -174,6 +174,9 @@
         // อัปเดต tagsDetail โดยลบข้อมูลที่เกี่ยวข้องกับ tag ที่ถูกลบ
         tagsDetail = tagsDetail.filter(tagDetail => tagDetail.part_no !== removedTag.part_no);
 
+        // บันทึกข้อมูลที่อัปเดตลงใน localStorage
+        saveToLocalStorage();
+
         // อัปเดตตาราง
         updateTableBody1();
         tableBody2.innerHTML = '';
@@ -183,7 +186,11 @@
     }
 
     function deleteTagDetail(index) {
+        // ลบข้อมูลออกจาก tagsDetail
         tagsDetail.splice(index, 1);
+
+        // บันทึกข้อมูลที่อัปเดตลงใน localStorage
+        saveToLocalStorage();
 
         tableBody2.innerHTML = '';
         tagsDetail.forEach(tag => {
@@ -216,7 +223,7 @@
         @this.$dispatch('close-modal', {
             id: 'confirmSaveModal'
         });
-        
+
         // ส่งข้อมูลไปยัง Backend
         @this.handleConfirmSave(section.value, tagsDetail, tags);
 
