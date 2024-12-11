@@ -14,6 +14,7 @@ use App\Models\TransferBook;
 use App\Models\VcstTrack;
 use App\Models\VcstTrackDetail;
 use Auth;
+use DB;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\DatePicker;
 // use Filament\Forms\Components\Section;
@@ -113,7 +114,9 @@ class WrDetail extends Page implements HasTable
                     ->sortable(),
                 TextColumn::make('CPART_NO')
                     ->label('Part No')
-                    ->searchable()
+                    ->searchable(query: function ($query, $search) {
+                        $query->orWhere(DB::raw('LTRIM(RTRIM(TRACK.CPART_NO))'), 'like', "%{$search}%");
+                    })
                     ->sortable(),
                 TextColumn::make('FCSNAME')
                     ->label('Part Code')
