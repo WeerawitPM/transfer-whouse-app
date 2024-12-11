@@ -93,12 +93,16 @@ class Detail extends Page implements HasTable
                     ->sortable(),
                 TextColumn::make('DOC_NO')
                     ->label('Doc No')
-                    ->sortable()
-                    ->searchable(),
+                    ->searchable(query: function ($query, $search) {
+                        $query->orWhereRaw('LTRIM(RTRIM(GLREF.FCCODE)) like ?', ["%{$search}%"]);
+                    })
+                    ->sortable(),
                 TextColumn::make('REF_NO')
                     ->label('Ref No')
-                    ->sortable()
-                    ->searchable(),
+                    ->searchable(query: function ($query, $search) {
+                        $query->orWhereRaw('LTRIM(RTRIM(GLREF.FCREFNO)) like ?', ["%{$search}%"]);
+                    })
+                    ->sortable(),
                 TextColumn::make('FDDATE')->date('Y-m-d')
                     ->sortable()
                     ->label("Date"),
