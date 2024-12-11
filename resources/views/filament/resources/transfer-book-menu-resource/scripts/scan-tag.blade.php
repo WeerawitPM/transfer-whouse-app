@@ -1,8 +1,8 @@
 <script>
     const tableBody1 = document.querySelector("#partsTable tbody");
     const tableBody2 = document.querySelector("#partsTable2 tbody");
-    let tags = [];
-    let tagsDetail = [];
+    let tags = JSON.parse(localStorage.getItem('tags')) || [];
+    let tagsDetail = JSON.parse(localStorage.getItem('tagsDetail')) || [];
 
     document.addEventListener("DOMContentLoaded", function() {
         const inputQrCode = document.getElementById('input_qr_code');
@@ -22,52 +22,39 @@
                 if (event.key === 'Enter') {
                     // console.log(section.value);
                     event.preventDefault();
-                    @this.handleQrCodeInput(inputQrCode.value).then((value) => {
-                        if (typeof value == 'string') {
-                            errorText.textContent = value;
-                        } else {
-                            // ตรวจสอบว่า qr_code มีอยู่ใน tagsDetail หรือไม่
-                            const exists = tagsDetail.some(tag => tag.qr_code === value
-                                .qr_code);
-                            if (exists) {
-                                errorText.textContent = "ข้อมูลนี้มีอยู่ในตารางแล้ว!";
-                            } else {
-                                tagsDetail.push(value);
-                                updateTableBody2(value);
-                                updateTags(); // อัปเดต tags หลังเพิ่มข้อมูลใน tagsDetail
-                                // console.log(tags);
-                            }
-                        }
-                    });
-                    inputQrCode.value = '';
-                    inputQrCode.focus();
+                    input_qr_code();
                 }
             });
 
             inputQrCode.addEventListener('keydown', function(event) {
                 if (event.keyCode == 9) { //tab pressed
                     event.preventDefault();
-                    @this.handleQrCodeInput(inputQrCode.value).then((value) => {
-                        if (typeof value == 'string') {
-                            errorText.textContent = value;
-                        } else {
-                            // ตรวจสอบว่า qr_code มีอยู่ใน tagsDetail หรือไม่
-                            const exists = tagsDetail.some(tag => tag.qr_code === value
-                                .qr_code);
-                            if (exists) {
-                                alert("ข้อมูลนี้มีอยู่ในตารางแล้ว!");
-                            } else {
-                                tagsDetail.push(value);
-                                updateTableBody2(value);
-                                updateTags(); // อัปเดต tags หลังเพิ่มข้อมูลใน tagsDetail
-                                // console.log(tags);
-                            }
-                        }
-                    });
-                    inputQrCode.value = '';
-                    inputQrCode.focus();
+                    input_qr_code();
                 }
             });
+
+            function input_qr_code() {
+                @this.handleQrCodeInput(inputQrCode.value).then((value) => {
+                    if (typeof value == 'string') {
+                        errorText.textContent = value;
+                    } else {
+                        // ตรวจสอบว่า qr_code มีอยู่ใน tagsDetail หรือไม่
+                        const exists = tagsDetail.some(tag => tag.qr_code === value
+                            .qr_code);
+                        if (exists) {
+                            errorText.textContent = "ข้อมูลนี้มีอยู่ในตารางแล้ว!";
+                        } else {
+                            tagsDetail.push(value);
+                            updateTableBody2(value);
+                            updateTags(); // อัปเดต tags หลังเพิ่มข้อมูลใน tagsDetail
+                            saveToLocalStorage();
+                            // console.log(tags);
+                        }
+                    }
+                });
+                inputQrCode.value = '';
+                inputQrCode.focus();
+            }
         }
 
         const focus_btn = document.getElementsByClassName('fi-input-wrp-icon');
@@ -77,7 +64,24 @@
                 inputQrCode.focus();
             });
         }
+
+        // โหลดข้อมูลจาก localStorage ไปที่ตาราง
+        loadTableFromStorage();
     });
+
+    // ฟังก์ชันสำหรับบันทึกข้อมูลใน localStorage
+    function saveToLocalStorage() {
+        localStorage.setItem('tags', JSON.stringify(tags));
+        localStorage.setItem('tagsDetail', JSON.stringify(tagsDetail));
+    }
+
+    // ฟังก์ชันสำหรับโหลดข้อมูลจาก localStorage และอัปเดตตาราง
+    function loadTableFromStorage() {
+        tagsDetail.forEach(tag => {
+            updateTableBody2(tag);
+        });
+        updateTags(); // อัปเดต tags หลังจากโหลดข้อมูล
+    }
 
     function updateTags() {
         // รวม qty ของ part_no ที่ซ้ำกันใน tagsDetail
@@ -207,9 +211,17 @@
         // console.log(section.value);
         const btn_save = document.getElementById('btn_save');
         btn_save.style.display = "none";
+
+        // ปิด Modal
         @this.$dispatch('close-modal', {
             id: 'confirmSaveModal'
         });
+        
+        // ส่งข้อมูลไปยัง Backend
         @this.handleConfirmSave(section.value, tagsDetail, tags);
+
+        // ลบข้อมูลใน localStorage
+        localStorage.removeItem('tags');
+        localStorage.removeItem('tagsDetail');
     }
 </script>

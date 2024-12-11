@@ -100,6 +100,7 @@ class ScanTag extends Page
 
     public function handleConfirmSave($section, $jobToTag, $jobDetail)
     {
+        // dd($jobToTag, $jobDetail);
         $user = Auth::user();
         $book = TransferBook::where('id', $this->id)->get()->first()->book;
         $remark = "Scan";
@@ -116,6 +117,7 @@ class ScanTag extends Page
 
         // Debug ข้อมูล
         // dd($jobToTag, $jobDetail, $jobToTagQuantities, $isComplete);
+        return redirect()->back();
     }
 
     public function handleUpdateSection($state)
